@@ -9,54 +9,26 @@ export const siteConfig = {
       href: "/",
     },
     {
-      label: "Docs",
-      href: "/docs",
-    },
-    {
-      label: "Pricing",
-      href: "/pricing",
-    },
-    {
-      label: "Blog",
-      href: "/blog",
-    },
-    {
       label: "About",
       href: "/about",
-    },
-  ],
-  navMenuItems: [
-    {
-      label: "Profile",
-      href: "/profile",
-    },
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      label: "Projects",
-      href: "/projects",
     },
     {
       label: "Team",
       href: "/team",
     },
+  ],
+  navMenuItems: [
     {
-      label: "Calendar",
-      href: "/calendar",
+      label: "Home",
+      href: "/",
     },
     {
-      label: "Settings",
-      href: "/settings",
+      label: "About",
+      href: "/about",
     },
     {
-      label: "Help & Feedback",
-      href: "/help-feedback",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
+      label: "Team",
+      href: "/team",
     },
   ],
   links: {

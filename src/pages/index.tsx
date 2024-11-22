@@ -1,58 +1,28 @@
-import { Link } from "@nextui-org/link";
-import { Snippet } from "@nextui-org/snippet";
-import { Code } from "@nextui-org/code";
-import { button as buttonStyles } from "@nextui-org/theme";
-
-import { siteConfig } from "@/config/site";
-import { title, subtitle } from "@/components/primitives";
-import { GithubIcon } from "@/components/icons";
 import DefaultLayout from "@/layouts/default";
+import { PrivacyGuardianLogo } from "@/components/icons.tsx";
+
+const masthead = (
+  <div className="inline-block ml-4">
+    <div className="text-8xl font-semibold">
+      <div className="flex items-end gap-5">
+        <div>Privacy</div>
+        <PrivacyGuardianLogo className="-mb-4" size={105} />
+      </div>
+      <div className="mt-1">Guardian</div>
+    </div>
+    <div className="text-3xl text-default-400 font-medium mt-3">
+      Understand what you&#39;re signing.
+    </div>
+  </div>
+);
 
 export default function IndexPage() {
   return (
     <DefaultLayout>
-      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-        <div className="inline-block max-w-lg text-center justify-center">
-          <span className={title()}>Make&nbsp;</span>
-          <span className={title({ color: "violet" })}>beautiful&nbsp;</span>
-          <br />
-          <span className={title()}>
-            websites regardless of your design experience.
-          </span>
-          <div className={subtitle({ class: "mt-4" })}>
-            Beautiful, fast and modern React UI library.
-          </div>
-        </div>
-
-        <div className="flex gap-3">
-          <Link
-            isExternal
-            className={buttonStyles({
-              color: "primary",
-              radius: "full",
-              variant: "shadow",
-            })}
-            href={siteConfig.links.docs}
-          >
-            Documentation
-          </Link>
-          <Link
-            isExternal
-            className={buttonStyles({ variant: "bordered", radius: "full" })}
-            href={siteConfig.links.github}
-          >
-            <GithubIcon size={20} />
-            GitHub
-          </Link>
-        </div>
-
-        <div className="mt-8">
-          <Snippet hideCopyButton hideSymbol variant="bordered">
-            <span>
-              Get started by editing{" "}
-              <Code color="primary">pages/index.tsx</Code>
-            </span>
-          </Snippet>
+      <section className="flex justify-between py-8 md:py-10">
+        {masthead}
+        <div>
+          <p>HGI</p>
         </div>
       </section>
     </DefaultLayout>
