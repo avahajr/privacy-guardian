@@ -12,6 +12,10 @@ export default function GoalStack({ goals }: GoalStackProps) {
     setGoalsList([...goalsList, ""]);
   };
 
+  const removeGoal = (index: number) => () => {
+    setGoalsList(goalsList.filter((_, i) => i !== index));
+  }
+
   useEffect(() => {}, [goalsList]);
 
   return (
@@ -27,7 +31,9 @@ export default function GoalStack({ goals }: GoalStackProps) {
           >
             <div className="flex justify-between">
               <span>{goal}</span>
-              <i className="bi bi-trash3 hover:text-danger-600 hover:cursor-pointer" />
+              <i className="bi bi-trash3 hover:text-danger-600 hover:cursor-pointer"
+              onClick={removeGoal(index)}
+              />
             </div>
           </li>
         ))}
