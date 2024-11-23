@@ -1,5 +1,6 @@
 import { Select, SelectItem } from "@nextui-org/select";
 import { Button } from "@nextui-org/button";
+import { Link } from "@nextui-org/link";
 
 import DefaultLayout from "@/layouts/default";
 import { PrivacyGuardianLogo } from "@/components/icons.tsx";
@@ -7,14 +8,14 @@ import { siteConfig } from "@/config/site.ts";
 
 const masthead = (
   <div className="inline-block ml-4">
-    <div className="text-8xl font-semibold">
+    <div className="text-6xl sm:text-7xl md:text-8xl font-semibold">
       <div className="flex items-end gap-5">
         <div>Privacy</div>
         <PrivacyGuardianLogo className="-mb-4" size={105} />
       </div>
       <div className="mt-1">Guardian</div>
     </div>
-    <div className="text-3xl text-default-400 font-medium mt-3">
+    <div className="text-2xl sm:text-3xl text-default-400 font-medium mt-3">
       Understand what you&#39;re signing.
     </div>
   </div>
@@ -41,7 +42,14 @@ export default function IndexPage() {
             ))}
           </Select>
           <div className="flex justify-end">
-            <Button className="max-w-fit" color="secondary" size="md" variant="solid">
+            <Button
+              as={Link}
+              className="max-w-fit"
+              color="secondary"
+              href="./goals"
+              size="md"
+              variant="solid"
+            >
               <div className="flex gap-2.5">
                 <div>Let&#39;s go</div>
                 <i className="bi bi-arrow-right" />
@@ -51,6 +59,5 @@ export default function IndexPage() {
         </div>
       </section>
     </DefaultLayout>
-  )
-    ;
+  );
 }
