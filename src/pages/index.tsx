@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Select, SelectItem } from "@nextui-org/select";
 import { Button } from "@nextui-org/button";
 import { Link } from "@nextui-org/link";
@@ -22,6 +23,20 @@ const masthead = (
 );
 
 export default function IndexPage() {
+  const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+  const [isInvalid, setIsInvalid] = useState(false);
+
+  const handlePolicyChange = (policy: string) => {
+    setSelectedPolicy(policy);
+    setIsInvalid(false);
+  };
+
+  const handleButtonClick = () => {
+    if (!selectedPolicy) {
+      setIsInvalid(true);
+    }
+  };
+
   return (
     <DefaultLayout width={5}>
       <section className="flex justify-between py-8 md:py-10">
@@ -31,14 +46,19 @@ export default function IndexPage() {
             Select a policy to analyze.
           </div>
           <Select
-            className="min-w-40 my-4"
+            className="min-w-40 min-h-28 pt-3"
+            errorMessage={isInvalid ? "Please select a policy to proceed." : ""}
+            isInvalid={isInvalid}
             label={"Policy"}
             placeholder="Select a policy..."
             size="lg"
             variant={"bordered"}
+            onChange={(e) => handlePolicyChange(e.target.value)}
           >
             {siteConfig.policies.map((policy) => (
-              <SelectItem key={policy}>{policy}</SelectItem>
+              <SelectItem key={policy} value={policy}>
+                {policy}
+              </SelectItem>
             ))}
           </Select>
           <div className="flex justify-end">
@@ -46,9 +66,11 @@ export default function IndexPage() {
               as={Link}
               className="max-w-fit"
               color="secondary"
-              href="./goals"
+              href={selectedPolicy ? "./goals" : "#"}
               size="md"
               variant="solid"
+              onClick={handleButtonClick}
+              onPress={handleButtonClick}
             >
               <div className="flex gap-2.5">
                 <div>Let&#39;s go</div>
