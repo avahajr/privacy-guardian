@@ -1,4 +1,5 @@
 import { Link } from "@nextui-org/link";
+import { Button } from "@nextui-org/button";
 
 import DefaultLayout from "@/layouts/default";
 import Policy from "@/components/policy.tsx";
@@ -15,7 +16,7 @@ export default function GoalsPage() {
           </Link>
           <Policy policy={"Apple"} />
         </div>
-        <div className={"flex flex-col gap-2 w-full"}>
+        <div className={"flex flex-col gap-2 w-full min-h-96"}>
           <div className="flex justify-between">
             <h3 className="text-xl font-medium">My Goals</h3>
             <div className="text-default-400 flex gap-1">
@@ -24,6 +25,12 @@ export default function GoalsPage() {
             </div>
           </div>
           <GoalStack goals={["Don't sell my data", "Eat the rich"]} />
+          <div className="flex justify-end mt-5">
+            <Button color="secondary">
+              Analyze
+              <i className="bi bi-arrow-right" />
+            </Button>
+          </div>
         </div>
       </section>
     </DefaultLayout>
