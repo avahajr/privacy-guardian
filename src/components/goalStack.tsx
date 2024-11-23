@@ -3,9 +3,10 @@ import { Button } from "@nextui-org/button";
 
 interface GoalStackProps {
   goals: string[];
+  isEditable?: boolean;
 }
 
-export default function GoalStack({ goals }: GoalStackProps) {
+export default function GoalStack({ goals, isEditable = true }: GoalStackProps) {
   const [goalsList, setGoalsList] = useState(goals);
   const [inputValues, setInputValues] = useState<string[]>(goals);
   const [newGoals, setNewGoals] = useState<boolean[]>(goals.map(() => false));
@@ -13,7 +14,6 @@ export default function GoalStack({ goals }: GoalStackProps) {
 
   const addGoal = () => {
     const nonEmptyGoals = inputValues.filter((goal) => goal.trim() !== "");
-
     setGoalsList([...nonEmptyGoals, ""]);
     setInputValues([...nonEmptyGoals, ""]);
     setNewGoals([...newGoals, true]);
@@ -28,7 +28,6 @@ export default function GoalStack({ goals }: GoalStackProps) {
   const handleInputChange =
     (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const newInputValues = [...inputValues];
-
       newInputValues[index] = event.target.value;
       setInputValues(newInputValues);
       setGoalsList(newInputValues);
@@ -39,7 +38,6 @@ export default function GoalStack({ goals }: GoalStackProps) {
       removeGoal(index)();
     } else {
       const newNewGoals = [...newGoals];
-
       newNewGoals[index] = false;
       setNewGoals(newNewGoals);
     }
@@ -49,6 +47,7 @@ export default function GoalStack({ goals }: GoalStackProps) {
     (index: number) => (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
         handleInputBlur(index)();
+        addGoal();
       }
     };
 
@@ -87,23 +86,30 @@ export default function GoalStack({ goals }: GoalStackProps) {
               ) : (
                 <span>{goal}</span>
               )}
-              <i
-                className="bi bi-trash3 hover:text-danger-600 hover:cursor-pointer"
-                role="button"
-                onClick={removeGoal(index)}
-              />
+              {isEditable && (
+                <i
+                  className="bi bi-trash3 hover:text-danger-600 hover:cursor-pointer"
+                  role="button"
+                  onClick={removeGoal(index)}
+                />)}
             </div>
           </li>
         ))}
       </ul>
-      <Button color={"secondary"} variant="flat" onPress={addGoal}>
-        <div className="flex justify-center">
-          <div className="flex gap-1">
-            <i className="bi bi-plus" />
-            <span>Add a goal</span>
+      {isEditable && (
+        <Button
+          color={"secondary"}
+          variant="flat"
+          onPress={addGoal}
+        >
+          <div className="flex justify-center">
+            <div className="flex gap-1">
+              <i className="bi bi-plus" />
+              <span>Add a goal</span>
+            </div>
           </div>
-        </div>
-      </Button>
+        </Button>
+      )}
     </>
   );
 }

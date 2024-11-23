@@ -24,9 +24,9 @@ export default function GoalsPage() {
               <span>Suggest...</span>
             </div>
           </div>
-          <GoalStack goals={["Don't sell my data", "Eat the rich"]} />
+          <GoalStack isEditable={true} goals={["Don't sell my data", "Eat the rich"]} />
           <div className="flex justify-end mt-5">
-            <Button color="secondary">
+            <Button as={Link} color="secondary" href="/breakdown">
               Analyze
               <i className="bi bi-arrow-right" />
             </Button>
