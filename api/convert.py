@@ -13,14 +13,18 @@ def wrap_sentences_in_spans(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
     count = 1
 
-    for p in soup.find_all('p'):
-        sentences = p.text.split('. ')
+    def wrap_text_in_spans(element):
+        nonlocal count
+        sentences = element.text.split('. ')
         new_content = ''
         for sentence in sentences:
             new_content += f'<span id="{count}">{sentence.strip()}.</span> '
             count += 1
-        p.clear()
-        p.append(BeautifulSoup(new_content.strip(), 'html.parser'))
+        element.clear()
+        element.append(BeautifulSoup(new_content.strip(), 'html.parser'))
+
+    for p in soup.find_all(['p', 'li', 'td']):
+        wrap_text_in_spans(p)
 
     return str(soup)
 
