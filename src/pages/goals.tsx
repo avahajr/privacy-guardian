@@ -1,11 +1,14 @@
 import { Link } from "@nextui-org/link";
 import { Button } from "@nextui-org/button";
+import { useEffect, useState } from "react";
 
 import DefaultLayout from "@/layouts/default";
 import Policy from "@/components/policy.tsx";
 import GoalStack from "@/components/goalStack.tsx";
 
 export default function GoalsPage() {
+  const [goals, setGoals] = useState([]);
+
   return (
     <DefaultLayout width={7}>
       <section className="flex gap-4 py-8 md:py-10">
@@ -24,7 +27,7 @@ export default function GoalsPage() {
               <span>Suggest...</span>
             </div>
           </div>
-          <GoalStack isEditable={true} goals={["Don't sell my data", "Eat the rich"]} />
+          <GoalStack goals={goals} isEditable={true} />
           <div className="flex justify-end mt-5">
             <Button as={Link} color="secondary" href="/breakdown">
               Analyze
