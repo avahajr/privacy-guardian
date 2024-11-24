@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Select, SelectItem } from "@nextui-org/select";
 import { Button } from "@nextui-org/button";
 import { Link } from "@nextui-org/link";
@@ -23,12 +23,34 @@ const masthead = (
 );
 
 export default function IndexPage() {
-  const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+  const [selectedPolicy, setSelectedPolicy] = useState<string | null>("Apple");
   const [isInvalid, setIsInvalid] = useState(false);
 
-  const handlePolicyChange = (policy: string) => {
-    setSelectedPolicy(policy);
-    setIsInvalid(false);
+  useEffect(() => {
+    fetch("http://localhost:5000/api/policy",
+      { method: "GET" }).then((response) =>
+      response.json()).then((data) => {
+        console.log(data);
+        setSelectedPolicy(data.policy);
+      });
+  }, []);
+
+  const handlePolicyChange = async (policy: string) => {
+    if (policy) {
+      setSelectedPolicy(policy);
+      setIsInvalid(false);
+
+      const response = await fetch("http://localhost:5000/api/policy", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ policy })
+      });
+
+      const data = await response.json();
+      console.log(data);
+    }
   };
 
   const handleButtonClick = () => {
@@ -53,6 +75,7 @@ export default function IndexPage() {
             placeholder="Select a policy..."
             size="lg"
             variant={"bordered"}
+            selectedKeys={[selectedPolicy]}
             onChange={(e) => handlePolicyChange(e.target.value)}
           >
             {siteConfig.policies.map((policy) => (

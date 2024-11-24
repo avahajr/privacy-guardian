@@ -13,7 +13,7 @@ def split_paragraph_into_sentences(paragraph):
 
 class GoalRating(BaseModel):
     goal: str
-    rating: int
+    rating: int | None
 
 class Rating(BaseModel):
     rating: int
@@ -44,8 +44,15 @@ class GPT:
             "role": "assistant",
             "content": f"Here is the privacy policy for {self.policy_name}: \n{self.policy_html}"}
 
+    def change_policy(self, policy_name: str):
+        self.policy_name = policy_name
+        self.policy_html = self.retrieve_policy_text()
+        self.assistant_message = {
+            "role": "assistant",
+            "content": f"Here is the privacy policy for {self.policy_name}: \n{self.policy_html}"}
+
     def retrieve_policy_text(self):
-        with open(f'../public/policies/{self.policy_name}.html', 'r') as f:
+        with open(f'public/policies/{self.policy_name.lower()}.html', 'r') as f:
             policy_text = f.read()
         return policy_text
 
@@ -55,7 +62,7 @@ class GPT:
             prompt = (f"Is the following goal met by the provided privacy policy?\n'{goal}'"
                       f"\n\nRating scale: 0 (not met) to 2 (fully met)")
 
-            print("Asking GPT: ", prompt)
+            # print("Asking GPT: ", prompt)
             response = self.client.beta.chat.completions.parse(
                 model="gpt-4o-mini",
                 messages=[
@@ -83,8 +90,9 @@ class GPT:
                     num_paragraphs = 1
 
             user_message = {"role": "user", "content": f"This the goal\n {goal.goal} has a rating of {goal.rating} \nRating scale: 0 (not met) to 2 (fully met)"
-                                                       f"\nIn {num_paragraphs} short paragraphs, summarize the policy's compliance with this goal."}
-            response = self.client.beta.chat.completions.parse(
+                                                       f"\nWithout mentioning the underlying rating,"
+                                                       f"in {num_paragraphs} short paragraphs, summarize the policy's compliance with this goal."}
+            response = self.client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
                     self.system_message,
@@ -93,7 +101,9 @@ class GPT:
                 ],
             )
 
-            goals_with_summaries.append(GoalSummary(goal=goal.goal, rating=goal.rating, summary=response.choices[0].message))
+            print(response.choices[0].message.content)
+
+            goals_with_summaries.append(GoalSummary(goal=goal.goal, rating=goal.rating, summary=response.choices[0].message.content))
 
         return goals_with_summaries
 
@@ -120,7 +130,12 @@ class GPT:
 
 if __name__ == "__main__":
     testGPT = GPT("apple")
-    print(testGPT.policy_html)
+    # print(testGPT.policy_html)
     goals = ["do not sell my personal information", "opt out of data sharing", "data security"]
     goal_ratings = testGPT.rate_goals(goals)
     print(goal_ratings)
+
+    goal_summaries = testGPT.summarize_goals(goal_ratings)
+    print(goal_summaries)
+
+    print(testGPT.cite_summary(goal_summaries[0].summary))
