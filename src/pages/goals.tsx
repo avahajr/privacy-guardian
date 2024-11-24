@@ -1,13 +1,11 @@
 import { Link } from "@nextui-org/link";
 import { Button } from "@nextui-org/button";
-import { useEffect, useState } from "react";
 
 import DefaultLayout from "@/layouts/default";
 import Policy from "@/components/policy.tsx";
 import GoalStack from "@/components/goalStack.tsx";
 
 export default function GoalsPage() {
-  const [goals, setGoals] = useState([]);
 
   return (
     <DefaultLayout width={7}>
@@ -17,7 +15,7 @@ export default function GoalsPage() {
             <i className="bi bi-arrow-left pr-1" />
             Back to policy selection{" "}
           </Link>
-          <Policy policy={"Apple"} />
+          <Policy />
         </div>
         <div className={"flex flex-col gap-2 w-full min-h-96"}>
           <div className="flex justify-between">
@@ -27,7 +25,7 @@ export default function GoalsPage() {
               <span>Suggest...</span>
             </div>
           </div>
-          <GoalStack goals={goals} isEditable={true} />
+          <GoalStack isEditable={true} />
           <div className="flex justify-end mt-5">
             <Button as={Link} color="secondary" href="/breakdown">
               Analyze

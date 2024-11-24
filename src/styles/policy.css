@@ -1,0 +1,53 @@
+#policy-text {
+    overflow-y: scroll;
+    max-height: 60vh;
+}
+
+#policy-text h1 {
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-bottom: .5em;
+}
+
+
+#policy-text h2 {
+    font-size: 1.25em;
+    font-weight: 500;
+    margin-bottom: .5em;
+    margin-top: .25em;
+}
+
+#policy-text h3 {
+    font-size: 1em;
+    font-weight: 500;
+    margin-bottom: .5em;
+}
+
+#policy-text p, #policy-text ul {
+    margin-bottom: .5em;
+}
+
+#policy-text li {
+    margin-bottom: .25em;
+}
+
+#policy-text ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+#policy-text table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#policy-text table, th, td {
+    border: 1px solid rgba(128, 128, 128, 0.16);
+    border-radius: 1em;
+
+}
+
+#policy-text th, td {
+    padding: 8px;
+    text-align: left;
+}
