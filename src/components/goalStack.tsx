@@ -20,6 +20,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
       .then((response) => response.json())
       .then((data) => {
         const apiGoals = data.map(({ goal }: GoalRating) => goal);
+
         setGoalsList(apiGoals);
       });
   }, []);
@@ -31,9 +32,9 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
       fetch("http://localhost:5000/api/goals", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ goal: inProcessGoal })
+        body: JSON.stringify({ goal: inProcessGoal }),
       });
 
       setInProcessGoal("");
@@ -54,7 +55,15 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
 
   const removeGoal = (index: number) => () => {
     const newGoalsList = goalsList.filter((_, i) => i !== index);
+
     setGoalsList(newGoalsList);
+    fetch("http://localhost:5000/api/goals", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ goal: goalsList[index] }),
+    });
   };
 
   return (
@@ -66,7 +75,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
         {goalsList.map((goal, index) => (
           <li
             key={index}
-            className={`w-full px-4 py-2 border-t border-l border-r border-gray-200 ${index === 0 ? "rounded-t-lg" : ""} ${!isAddingGoal && index === goalsList.length-1 && "rounded-b-lg border-b"} dark:border-gray-600`}
+            className={`w-full px-4 py-2 border-t border-l border-r border-gray-200 ${index === 0 ? "rounded-t-lg" : ""} ${!isAddingGoal && index === goalsList.length - 1 && "rounded-b-lg border-b"} dark:border-gray-600`}
           >
             <div className="flex items-center gap-2 justify-between">
               <span>{goal}</span>
@@ -84,10 +93,10 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
           <li className="w-full px-4 py-2 border rounded-b-lg border-gray-200 dark:border-gray-600">
             <div className="flex items-center gap-2 justify-between">
               <input
+                autoFocus
                 className="w-full px-2 py-1 border rounded"
                 type="text"
                 value={inProcessGoal}
-                autoFocus
                 onBlur={addGoal}
                 onChange={changeInProcessGoal}
                 onKeyDown={handleKeyDown}

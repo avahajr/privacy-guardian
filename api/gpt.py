@@ -4,16 +4,18 @@ from pydantic import BaseModel
 import os
 import re
 
+
 def split_paragraph_into_sentences(paragraph):
     # Regular expression to match sentence endings
     sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
-    sentences = sentence_endings.split(paragraph)
+    sentences = sentence_endings.split(paragraph.summary)
     return sentences
 
 
 class GoalRating(BaseModel):
     goal: str
     rating: int | None
+
 
 class Rating(BaseModel):
     rating: int
@@ -60,7 +62,7 @@ class GPT:
         goal_ratings = []
         for goal in goals:
             prompt = (f"Is the following goal met by the provided privacy policy?\n'{goal}'"
-                      f"\n\nRating scale: 0 (not met) to 2 (fully met)")
+                      f"\n\nRating scale:0 (fully met) to 2 (not met)")
 
             # print("Asking GPT: ", prompt)
             response = self.client.beta.chat.completions.parse(
@@ -73,13 +75,13 @@ class GPT:
                 response_format=Rating,
             )
             goal_rating = response.choices[0].message.parsed
-            goal_ratings.append(GoalRating(goal=goal, rating=goal_rating.rating))
+            goal_ratings.append(GoalRating(goal=goal["goal"], rating=goal_rating.rating))
         return goal_ratings
 
     def summarize_goals(self, goals: list[GoalRating]) -> list[GoalSummary]:
         goals_with_summaries = []
         for goal in goals:
-            match goal.rating:
+            match goal["rating"]:
                 case 0:
                     num_paragraphs = 1
                 case 1:
@@ -89,9 +91,10 @@ class GPT:
                 case _:
                     num_paragraphs = 1
 
-            user_message = {"role": "user", "content": f"This the goal\n {goal.goal} has a rating of {goal.rating} \nRating scale: 0 (not met) to 2 (fully met)"
-                                                       f"\nWithout mentioning the underlying rating,"
-                                                       f"in {num_paragraphs} short paragraphs, summarize the policy's compliance with this goal."}
+            user_message = {"role": "user",
+                            "content": f"This the goal\n {goal['goal']} has a rating of {goal['rating']} \nRating scale: 0 (fully met) to 2 (not met)"
+                                       f"\nWithout mentioning the underlying rating,"
+                                       f"in {num_paragraphs} short paragraphs, summarize the policy's compliance with this goal."}
             response = self.client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
@@ -103,7 +106,8 @@ class GPT:
 
             print(response.choices[0].message.content)
 
-            goals_with_summaries.append(GoalSummary(goal=goal.goal, rating=goal.rating, summary=response.choices[0].message.content))
+            goals_with_summaries.append(
+                GoalSummary(goal=goal['goal'], rating=goal['rating'], summary=response.choices[0].message.content))
 
         return goals_with_summaries
 
@@ -111,8 +115,9 @@ class GPT:
         sentences = split_paragraph_into_sentences(summary)
         cited_summary = []
         for sentence in sentences:
-            user_message = {"role": "user", "content": f"Cite the supporting evidence for a sentence (which is from a summary):\n '{sentence}'\n"
-                                                       f"in the original policy text. Return the ids of the spans(s) which contain the evidence sentence in the policy."}
+            user_message = {"role": "user",
+                            "content": f"Cite the supporting evidence for a sentence (which is from a summary):\n '{sentence}'\n"
+                                       f"in the original policy text. Return the ids of the spans(s) which contain the evidence sentence in the policy."}
             response = self.client.beta.chat.completions.parse(
                 model="gpt-4o-mini-2024-07-18",
                 messages=[

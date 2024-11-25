@@ -5,8 +5,20 @@ import DefaultLayout from "@/layouts/default";
 import Policy from "@/components/policy.tsx";
 import GoalStack from "@/components/goalStack.tsx";
 import Breakdown from "@/components/breakdown.tsx";
+import SummaryStack from "@/components/summaryStack.tsx";
+import { useEffect, useState } from "react";
 
 export default function AnalysisPage() {
+  const [goals, setGoals] = useState<{ goal: string; rating: number }[]|null>(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/goals/rating", { method: "GET" })
+      .then((response) => response.json())
+      .then((data) => {
+        setGoals(data);
+      });
+  }, []);
+
   return (
     <DefaultLayout width={9}>
       <section className="flex gap-4 py-8 md:py-10">
@@ -20,7 +32,7 @@ export default function AnalysisPage() {
             <i className="bi bi-arrow-left pr-1" />
             Back to goals{" "}
           </Link>
-          <Policy policy={"Apple"} />
+          <Policy />
         </div>
         <div className={"flex flex-col gap-2 w-full min-h-96"}>
           <div className="flex justify-between mb-4">
@@ -29,29 +41,16 @@ export default function AnalysisPage() {
               Re-roll analysis
             </Button>
           </div>
-          <Breakdown
-            goals={[
-              { goal: "Don't sell my data", rating: 0 },
-              { goal: "Eat the rich", rating: 1 },
-              {
-                goal: "meep morp",
-                rating: 2,
-              },
-            ]}
-          />
+          {goals &&
+            <Breakdown goals={goals} />}
           <div className="flex justify-between mt-3">
             <h3 className="text-lg font-medium">My Goals</h3>
           </div>
           <GoalStack
-            goals={["Don't sell my data", "Eat the rich"]}
             isEditable={false}
           />
-          <div className="flex justify-end mt-5">
-            <Button as={Link} color="secondary" href="/breakdown">
-              Analyze
-              <i className="bi bi-arrow-right" />
-            </Button>
-          </div>
+          {goals &&
+            <SummaryStack />}
         </div>
       </section>
     </DefaultLayout>
