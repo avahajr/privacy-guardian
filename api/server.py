@@ -1,85 +1,107 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-from gpt import GPT
+from flask_cors import CORS, cross_origin
+from jinja2.ext import debug
+from pydantic import BaseModel
+
+from gpt import GPT, GoalSummary
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins":
-                                     "http://localhost:5173"}})
+CORS(app)
 
 selected_policy = "Apple"
 client = GPT(selected_policy)
 
-goals = [{"goal": "Don't sell my data", "rating": None},
-         {"goal": "Don't give my data to law enforcement", "rating": None},
-         {"goal": "Allow me to delete my data", "rating": None}]
+goals = [GoalSummary(goal=goal) for goal in
+         ["Don't sell my data", "Don't give my data to law enforcement", "Allow me to delete my data"]]
+
+
+def pydantic_jsonfiy(obj):
+    if isinstance(obj, list):
+        return jsonify([item.model_dump() for item in obj])
+
+    return jsonify(obj.model_dump())
 
 
 @app.route("/api/goals", methods=["GET"])
 def get_goals():
     global goals
-    return jsonify(goals)
+    response = pydantic_jsonfiy(goals)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 
 @app.route("/api/goals", methods=["POST"])
+@cross_origin()
 def add_goal():
     global goals
     data = request.get_json()
-    goals.append(data)
-    return jsonify(goals)
+    goals.append(GoalSummary(goal=data['goal']))
+    response = pydantic_jsonfiy(goals)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 
 @app.route("/api/goals", methods=["DELETE"])
+@cross_origin()
 def delete_goal():
     global goals
     data = request.get_json()
-    goals = [goal for goal in goals if goal['goal'] != data['goal']]
-    return jsonify(goals)
+    goals = [goal for goal in goals if goal.goal != data['goal']]
+    return pydantic_jsonfiy(goals)
 
 
 @app.route("/api/goals/rating", methods=["GET"])
+@cross_origin()
 def get_goal_ratings():
     global client
     global goals
-    goal_ratings = client.rate_goals(goals)
-    # Convert GoalRating objects to dictionaries
-    goal_ratings_dict = [goal_rating.__dict__ for goal_rating in goal_ratings]
-    goals = goal_ratings_dict
-    print(goals)
-    return jsonify(goal_ratings_dict)
+    goals = client.rate_goals(goals)
+    response = pydantic_jsonfiy(goals)
+
+    # response.headers.add("Access-Control-Allow-Origin", "*")
+
+    return response
 
 
-@app.route("/api/summary", methods=["GET"])
-def get_summary():
+@app.route("/api/summary/<id>", methods=["GET"])
+@cross_origin()
+def get_summary(id: int):
     global client
     global goals
-    summaries = client.summarize_goals(goals)
-    return jsonify(summaries)
+    summary = client.summarize_goal(goals[int(id)])
+    response = pydantic_jsonfiy(summary)
+    goals[int(id)] = summary
+    # response.headers.add("Access-Control-Allow-Origin", "*")
+
+    return response
 
 
-@app.route("/api/cite/summary", methods=["GET"])
-def get_cited_summary():
+@app.route("/api/cite/summary/<id>", methods=["GET"])
+@cross_origin()
+def get_cited_summary(id: int):
     global client
     global goals
-    print("goals is:")
-    print(goals)
 
-    # if 'rating' in goals[0] and goals[0]['rating']:
-    summaries = client.summarize_goals(goals)
-    cited_goals = []
-    for summary in summaries:
-        # print(summary)
-        cited_summary = client.cite_summary(summary)
-        cited_goals.append([s.__dict__ for s in cited_summary])
-    print(cited_goals)
-    return jsonify(cited_goals)
+    cited_summary = client.cite_summary(goals[int(id)])
+    goals[int(id)] = cited_summary
+    response = pydantic_jsonfiy(cited_summary)
+    # response.headers.add("Access-Control-Allow-Origin", "*")
+
+    return response
+
+
 # return jsonify({"msg":"something went wrong"})
 
 @app.route("/api/policy", methods=["GET"])
 def get_policy():
-    return jsonify({"policy": selected_policy})
+    response = jsonify({"policy": selected_policy})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+
+    return response
 
 
 @app.route("/api/policy", methods=["PUT"])
+@cross_origin()
 def update_policy():
     global selected_policy
     global client
@@ -92,8 +114,12 @@ def update_policy():
 
 
 @app.route("/api/html/policy", methods=["GET"])
+@cross_origin()
 def get_policy_html():
-    return jsonify({"policy_html": client.policy_html})
+    response = jsonify({"policy_html": client.policy_html})
+    # response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 
-app.run(port=5000)
+if __name__ == "__main__":
+    app.run(port=5000, debug=True)

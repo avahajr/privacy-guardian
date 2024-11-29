@@ -9,7 +9,9 @@ import SummaryStack from "@/components/summaryStack.tsx";
 import { useEffect, useState } from "react";
 
 export default function AnalysisPage() {
-  const [goals, setGoals] = useState<{ goal: string; rating: number }[]|null>(null);
+  const [goals, setGoals] = useState<{ goal: string; rating: number }[] | null>(
+    null,
+  );
 
   useEffect(() => {
     fetch("http://localhost:5000/api/goals/rating", { method: "GET" })
@@ -41,8 +43,7 @@ export default function AnalysisPage() {
               Re-roll analysis
             </Button>
           </div>
-          {goals &&
-            <Breakdown goals={goals} />}
+          {goals && <Breakdown goals={goals} />}
           <div className="flex justify-between mt-3">
             <h3 className="text-lg font-medium">My Goals</h3>
           </div>
@@ -50,7 +51,7 @@ export default function AnalysisPage() {
             isEditable={false}
           />
           {goals &&
-            <SummaryStack />}
+            <SummaryStack goals={goals} />}
         </div>
       </section>
     </DefaultLayout>

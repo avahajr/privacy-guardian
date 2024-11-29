@@ -1,16 +1,16 @@
 import classNames from "classnames";
-import { useState, useEffect } from "react";
 
 interface BreakdownElementProps {
   forRating: number;
   goals: { goal: string; rating: number }[];
+  isLoading: boolean;
 }
 
 interface BreakdownProps {
   goals: { goal: string; rating: number }[];
 }
 
-function BreakdownElement({ forRating, goals }: BreakdownElementProps) {
+function BreakdownElement({ forRating, goals, isLoading }: BreakdownElementProps) {
   const ratingText = [
     "Goals completely met",
     "Goals partially met",
@@ -24,7 +24,7 @@ function BreakdownElement({ forRating, goals }: BreakdownElementProps) {
   const numWithRating = goals.filter(
     (goal) => goal.rating === forRating
   ).length;
-
+  console.log("with rating", forRating, ":", numWithRating);
   return (
     <div
       className={classNames(
@@ -58,10 +58,11 @@ function BreakdownElement({ forRating, goals }: BreakdownElementProps) {
 }
 
 export default function Breakdown({ goals }: BreakdownProps) {
+  console.log(goals)
   return (
     <div className={"flex justify-between"}>
       {[2, 1, 0].map((rating) => (
-        <BreakdownElement key={rating} forRating={rating} goals={goals} />
+        <BreakdownElement key={rating} forRating={rating} goals={goals} isLoading={false} />
       ))}
     </div>
   );

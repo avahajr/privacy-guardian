@@ -4,27 +4,14 @@ from pydantic import BaseModel
 import os
 import re
 
-
-def split_paragraph_into_sentences(paragraph):
-    # Regular expression to match sentence endings
-    sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
-    sentences = sentence_endings.split(paragraph.summary)
-    return sentences
-
-
-class GoalRating(BaseModel):
-    goal: str
-    rating: int | None
-
-
 class Rating(BaseModel):
     rating: int
 
 
 class GoalSummary(BaseModel):
     goal: str
-    rating: int
-    summary: str
+    rating: int | None = None
+    summary: str | None = None
 
 
 class CitedSentence(BaseModel):
@@ -32,6 +19,22 @@ class CitedSentence(BaseModel):
     sentence: str
     quote_locations: list[int]
 
+class QuoteLocation(BaseModel):
+    locs: list[int]
+
+
+class GoalWithCitedSummary(BaseModel):
+    goal: str
+    rating: int
+    cited_sentences: list[CitedSentence]
+
+
+def split_paragraph_into_sentences(paragraph: GoalSummary ):
+    # Regular expression to match sentence endings
+    print(paragraph)
+    sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
+    sentences = sentence_endings.split(paragraph.summary)
+    return sentences
 
 class GPT:
     def __init__(self, policy_name: str):
@@ -54,11 +57,15 @@ class GPT:
             "content": f"Here is the privacy policy for {self.policy_name}: \n{self.policy_html}"}
 
     def retrieve_policy_text(self):
-        with open(f'public/policies/{self.policy_name.lower()}.html', 'r') as f:
-            policy_text = f.read()
+        if __name__ != "__main__":
+            with open(f'public/policies/{self.policy_name.lower()}.html', 'r') as f:
+                policy_text = f.read()
+        if __name__ == "__main__":
+            with open(f'../public/policies/{self.policy_name.lower()}.html', 'r') as f:
+                policy_text = f.read()
         return policy_text
 
-    def rate_goals(self, goals) -> list[GoalRating]:
+    def rate_goals(self, goals) -> list[GoalSummary]:
         goal_ratings = []
         for goal in goals:
             prompt = (f"Is the following goal met by the provided privacy policy?\n'{goal}'"
@@ -75,44 +82,38 @@ class GPT:
                 response_format=Rating,
             )
             goal_rating = response.choices[0].message.parsed
-            goal_ratings.append(GoalRating(goal=goal["goal"], rating=goal_rating.rating))
+            goal_ratings.append(GoalSummary(goal=goal.goal, rating=goal_rating.rating))
         return goal_ratings
 
-    def summarize_goals(self, goals: list[GoalRating]) -> list[GoalSummary]:
-        goals_with_summaries = []
-        for goal in goals:
-            match goal["rating"]:
-                case 0:
-                    num_paragraphs = 1
-                case 1:
-                    num_paragraphs = 2
-                case 2:
-                    num_paragraphs = 3
-                case _:
-                    num_paragraphs = 1
+    def summarize_goal(self, goal: GoalSummary) -> GoalSummary:
 
-            user_message = {"role": "user",
-                            "content": f"This the goal\n {goal['goal']} has a rating of {goal['rating']} \nRating scale: 0 (fully met) to 2 (not met)"
-                                       f"\nWithout mentioning the underlying rating,"
-                                       f"in {num_paragraphs} short paragraphs, summarize the policy's compliance with this goal."}
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    self.system_message,
-                    self.assistant_message,
-                    user_message
-                ],
-            )
+        match goal.rating:
+            case 0:
+                num_paragraphs = 1
+            case 1:
+                num_paragraphs = 2
+            case 2:
+                num_paragraphs = 3
+            case _:
+                num_paragraphs = 1
 
-            print(response.choices[0].message.content)
+        user_message = {"role": "user",
+                        "content": f"This the goal\n {goal.goal} has a rating of {goal.rating} \nRating scale: 0 (fully met) to 2 (not met)"
+                                   f"\nWithout mentioning the underlying rating,"
+                                   f"in {num_paragraphs} short paragraphs, summarize the policy's compliance with this goal."}
+        response = self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                self.system_message,
+                self.assistant_message,
+                user_message
+            ],
+        )
 
-            goals_with_summaries.append(
-                GoalSummary(goal=goal['goal'], rating=goal['rating'], summary=response.choices[0].message.content))
+        return GoalSummary(goal=goal.goal, rating=goal.rating, summary=response.choices[0].message.content)
 
-        return goals_with_summaries
-
-    def cite_summary(self, summary: str) -> list[CitedSentence]:
-        sentences = split_paragraph_into_sentences(summary)
+    def cite_summary(self, goal: GoalSummary) -> GoalWithCitedSummary:
+        sentences = split_paragraph_into_sentences(goal)
         cited_summary = []
         for sentence in sentences:
             user_message = {"role": "user",
@@ -125,22 +126,26 @@ class GPT:
                     self.assistant_message,
                     user_message
                 ],
-                response_format=CitedSentence,
+                response_format=QuoteLocation,
             )
-            cited_sentence = response.choices[0].message.parsed
-            cited_summary.append(cited_sentence)
+            quote_location = response.choices[0].message.parsed
+            cited_summary.append(CitedSentence(sentence=sentence, quote_locations=quote_location.locs))
 
-        return cited_summary
+        return GoalWithCitedSummary(goal=goal.goal, rating=goal.rating, cited_sentences=cited_summary)
 
 
 if __name__ == "__main__":
     testGPT = GPT("apple")
-    # print(testGPT.policy_html)
-    goals = ["do not sell my personal information", "opt out of data sharing", "data security"]
-    goal_ratings = testGPT.rate_goals(goals)
-    print(goal_ratings)
+    my_goals = [GoalSummary(goal=goal) for goal in
+                ["do not sell my personal information", "opt out of data sharing", "data security"]]
+    goal_ratings = testGPT.rate_goals(my_goals)
+    print([goal.model_dump() for goal in goal_ratings])
 
-    goal_summaries = testGPT.summarize_goals(goal_ratings)
-    print(goal_summaries)
+    goal_summaries = []
+    for goal in goal_ratings:
+        summary = testGPT.summarize_goal(goal)
+        goal_summaries.append(summary)
 
-    print(testGPT.cite_summary(goal_summaries[0].summary))
+    print([summary.model_dump() for summary in goal_summaries])
+
+    print(testGPT.cite_summary(goal_summaries[0]))
