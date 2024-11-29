@@ -9,38 +9,27 @@ interface CitedSentence {
 interface SummarizedGoal {
   goal: string;
   rating: number;
-  summary: CitedSentence[];
+  cited_sentences: CitedSentence[];
 }
 
-const fetchSummary = (id: number) => {
-  return fetch(`http://localhost:5000/api/summary/${id}`, { method: "GET" })
-    .then((response) => response.json())
-    .then(() => {
-      return fetch(`http://localhost:5000/api/cite/summary/${id}`, { method: "GET" })
-        .then((response) => response.json())
-        .then((citeSummary) => {
-          console.log(citeSummary)
-          return citeSummary.json();
-        });
-    });
+const fetchSummary = async (id: number) => {
+  let response1 = await fetch(`http://localhost:5000/api/summary/${id}`, { method: "GET" });
+
+  await response1.json();
+  let response = await fetch(`http://localhost:5000/api/cite/summary/${id}`, { method: "GET" });
+  let citeSummary: any = await response.json();
+
+  return citeSummary;
 };
 
-const renderSummary = (summary: SummarizedGoal | string) => {
-  if (typeof summary === "string") {
-    return <span>{summary}</span>;
-  } else if (typeof summary == "object") {
+const renderSummary = (summary: CitedSentence[] | string) => {
+  if (typeof summary == "object") {
     return (
-      <div>
-        <span>{summary.goal}</span>
-        <span>{summary.rating}</span>
-        <div>Cited</div>
-        {summary.summary.map(({ sentence, quote_locations }, i) => (
-          <div key={i}>
-            <span>{sentence}</span>
-            <span>{quote_locations.join(", ")}</span>
-          </div>
+      <ul>
+        {summary.map((sentence, i) => (
+          <li key={i}>{sentence.sentence} {sentence.quote_locations}</li>
         ))}
-      </div>
+      </ul>
     );
   }
 };
@@ -57,12 +46,12 @@ export default function SummaryStack({ goals }: { goals: { goal: string; rating:
 
   return (
     <div>
-      {summaries.map(({ goal, rating, summary }, i) => (
+      {summaries.map(({ goal, rating, cited_sentences }, i) => (
         <Card key={i}>
           <CardHeader>{goal}</CardHeader>
           <CardBody>
             <span>{rating}</span>
-            {renderSummary(summary)}
+            {renderSummary(cited_sentences)}
           </CardBody>
         </Card>
       ))}
