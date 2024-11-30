@@ -12,6 +12,10 @@ interface SummarizedGoal {
   cited_sentences: CitedSentence[];
 }
 
+const colors = ["text-success-600", "text-warning-600", "text-danger-600"];
+
+const icons = ["bi bi-check", "bi bi-exclamation-triangle", "bi bi-x"];
+
 const citation = ({
   spans_to_highlight,
   citation_num,
@@ -107,10 +111,15 @@ export default function SummaryStack({
 
   return (
     <div>
-      {summaries.map(({ goal, cited_sentences }, i) => (
-        <Card key={i} className="my-4 border" shadow={"none"}>
-          <CardHeader className="font-semibold text-xl">{goal}</CardHeader>
-          <CardBody>{renderSummary(cited_sentences)}</CardBody>
+      {summaries.map(({ goal, rating, cited_sentences }, i) => (
+        <Card key={i} className="my-4 border p-1" shadow={"none"}>
+          <CardHeader className="font-semibold text-xl -mb-4">
+            <div className="flex gap-1">
+              <i className={`${icons[rating]} ${colors[rating]}`} />
+              <span>{goal}</span>
+            </div>
+          </CardHeader>
+          <CardBody className="px-4">{renderSummary(cited_sentences)}</CardBody>
         </Card>
       ))}
     </div>
