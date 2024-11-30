@@ -142,7 +142,7 @@ export default function SummaryStack({
   return (
     <div>
       {groupedSummaries.map((group, rating) => (
-        <div key={rating} className="mt-10">
+        <div key={rating} className="mt-10 flex flex-col">
           {goalCounts[rating] > 0 && (
             <h2 className="text-2xl font-bold my-4">{sectionLabels[rating]}</h2>
           )}
@@ -161,7 +161,7 @@ export default function SummaryStack({
               </Card>
             </>
           ))}
-          {goalCounts[rating] > 0 && (seenGoals[rating] < goalCounts[rating]) && <Spinner/>}
+          {goalCounts[rating] > 0 && (seenGoals[rating] < goalCounts[rating]) && <Spinner className="self-center"/>}
         </div>
       ))}
     </div>
