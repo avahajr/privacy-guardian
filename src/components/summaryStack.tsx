@@ -142,13 +142,13 @@ export default function SummaryStack({
   return (
     <div>
       {groupedSummaries.map((group, rating) => (
-        <div key={rating} className="mt-10 flex flex-col">
+        <div key={rating} className="mt-5 flex flex-col">
           {goalCounts[rating] > 0 && (
             <h2 className="text-2xl font-bold my-4">{sectionLabels[rating]}</h2>
           )}
           {group.map(({ goal, rating, cited_sentences }, i) => (
             <>
-              <Card key={i} className="my-4 border p-1" shadow={"none"}>
+              <Card key={i} className="my-3 border p-1" shadow={"none"}>
                 <CardHeader className="font-semibold text-xl -mb-4">
                   <div className="flex gap-1">
                     <i className={`${icons[rating]} ${colors[rating]}`} />

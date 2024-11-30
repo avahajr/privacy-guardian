@@ -8,6 +8,7 @@ import Policy from "@/components/policy.tsx";
 import GoalStack from "@/components/goalStack.tsx";
 import Breakdown from "@/components/breakdown.tsx";
 import SummaryStack from "@/components/summaryStack.tsx";
+import Reaction from "@/components/reaction.tsx";
 
 export default function AnalysisPage() {
   const [goals, setGoals] = useState<{ goal: string; rating: number }[] | null>(
@@ -45,6 +46,8 @@ export default function AnalysisPage() {
             </Button>
           </div>
           {goals ? <Breakdown goals={goals} /> : <Spinner />}
+
+          {goals && <Reaction goals={goals} />}
           <div className="flex justify-between mt-3">
             <h3 className="text-lg font-medium">My Goals</h3>
           </div>
