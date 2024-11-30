@@ -14,7 +14,7 @@ interface SummarizedGoal {
 }
 
 const colors = ["text-success-600", "text-warning-600", "text-danger-600"];
-const icons = ["bi bi-check", "bi bi-exclamation-triangle", "bi bi-x"];
+const icons = ["bi bi-check", "bi bi-exclamation", "bi bi-x"];
 const sectionLabels = ["Goals Met", "Goals Partially Met", "Goals Not Met"];
 
 const citation = ({

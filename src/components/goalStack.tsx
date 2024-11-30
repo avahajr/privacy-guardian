@@ -18,7 +18,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
 
   const icons = [
     "bi bi-check",
-    "bi bi-exclamation-triangle",
+    "bi bi-exclamation",
     "bi bi-x"
   ];
   const colors = ["text-success-600", "text-warning-600", "text-danger-600"];
@@ -90,9 +90,9 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
             className={`w-full ps-2 pe-4 py-2 border-t border-l border-r border-gray-200 ${index === 0 ? "rounded-t-lg" : ""} ${!isAddingGoal && index === goalsList.length - 1 && "rounded-b-lg border-b"} dark:border-gray-600`}
           >
             <div className="flex items-center gap-2 justify-between">
-              <div className="flex gap-1">
+              <div className="flex gap-1 items-center">
                 {goal.rating !== -1 && (
-                  <i className={`bi ${icons[goal.rating]} ${colors[goal.rating]}`} />
+                  <i className={`bi ${icons[goal.rating]} ${colors[goal.rating]} text-lg`} />
                 )}
                 <span>{goal.goal}</span>
               </div>
