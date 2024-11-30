@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardBody } from "@nextui-org/card";
-
+import { Spinner } from "@nextui-org/spinner";
 interface CitedSentence {
   sentence: string;
   quote_locations: number[];
@@ -100,6 +100,7 @@ export default function SummaryStack({
   goals: { goal: string; rating: number }[];
 }) {
   const [summaries, setSummaries] = useState<SummarizedGoal[]>([]);
+  const [numGoals, setNumGoals] = useState<number>(1000000);
 
   useEffect(() => {
     goals.forEach((_, index) => {
@@ -107,6 +108,12 @@ export default function SummaryStack({
         setSummaries((prevSummaries) => [...prevSummaries, summary]);
       });
     });
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/num/goals", { method: "GET" })
+      .then((response) => response.json())
+      .then((data) => setNumGoals(data.num_goals));
   }, []);
 
   return (
@@ -122,6 +129,7 @@ export default function SummaryStack({
           <CardBody className="px-4">{renderSummary(cited_sentences)}</CardBody>
         </Card>
       ))}
+      {summaries.length < numGoals && <Spinner />}
     </div>
   );
 }

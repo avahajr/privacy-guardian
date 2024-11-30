@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Button } from "@nextui-org/button";
-import { color } from "framer-motion";
 
 interface GoalStackProps {
   isEditable?: boolean;

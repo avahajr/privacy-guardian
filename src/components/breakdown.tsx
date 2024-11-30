@@ -3,14 +3,13 @@ import classNames from "classnames";
 interface BreakdownElementProps {
   forRating: number;
   goals: { goal: string; rating: number }[];
-  isLoading: boolean;
 }
 
 interface BreakdownProps {
   goals: { goal: string; rating: number }[];
 }
 
-function BreakdownElement({ forRating, goals, isLoading }: BreakdownElementProps) {
+function BreakdownElement({ forRating, goals }: BreakdownElementProps) {
   const ratingText = [
     "Goals completely met",
     "Goals partially met",
@@ -59,10 +58,11 @@ function BreakdownElement({ forRating, goals, isLoading }: BreakdownElementProps
 
 export default function Breakdown({ goals }: BreakdownProps) {
   console.log(goals)
+
   return (
     <div className={"flex justify-between"}>
       {[2, 1, 0].map((rating) => (
-        <BreakdownElement key={rating} forRating={rating} goals={goals} isLoading={false} />
+        <BreakdownElement key={rating} forRating={rating} goals={goals} />
       ))}
     </div>
   );
