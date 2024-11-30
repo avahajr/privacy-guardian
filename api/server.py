@@ -35,7 +35,7 @@ def get_goals():
 def add_goal():
     global goals
     data = request.get_json()
-    goals.append(GoalSummary(goal=data['goal']))
+    goals.append(GoalSummary(goal=data['goal']['goal']))
     response = pydantic_jsonfiy(goals)
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response

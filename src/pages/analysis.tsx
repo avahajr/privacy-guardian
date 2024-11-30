@@ -1,16 +1,17 @@
 import { Link } from "@nextui-org/link";
 import { Button } from "@nextui-org/button";
 import { Spinner } from "@nextui-org/spinner";
+import { useEffect, useState } from "react";
+
 import DefaultLayout from "@/layouts/default";
 import Policy from "@/components/policy.tsx";
 import GoalStack from "@/components/goalStack.tsx";
 import Breakdown from "@/components/breakdown.tsx";
 import SummaryStack from "@/components/summaryStack.tsx";
-import { useEffect, useState } from "react";
 
 export default function AnalysisPage() {
   const [goals, setGoals] = useState<{ goal: string; rating: number }[] | null>(
-    null
+    null,
   );
 
   useEffect(() => {
@@ -43,16 +44,12 @@ export default function AnalysisPage() {
               Re-roll analysis
             </Button>
           </div>
-          {goals ? <Breakdown goals={goals} /> : <Spinner/>}
+          {goals ? <Breakdown goals={goals} /> : <Spinner />}
           <div className="flex justify-between mt-3">
             <h3 className="text-lg font-medium">My Goals</h3>
           </div>
-          {goals &&
-          <GoalStack
-            isEditable={false}
-          />}
-          {goals &&
-            <SummaryStack goals={goals} />}
+          {goals && <GoalStack isEditable={false} />}
+          {goals && <SummaryStack goals={goals} />}
         </div>
       </section>
     </DefaultLayout>
