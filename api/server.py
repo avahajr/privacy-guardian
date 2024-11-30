@@ -1,7 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-from jinja2.ext import debug
-from pydantic import BaseModel
 
 from gpt import GPT, GoalSummary
 
@@ -56,9 +54,8 @@ def get_goal_ratings():
     global client
     global goals
     goals = client.rate_goals(goals)
+    goals.sort(key=lambda x: x.rating, reverse=True)
     response = pydantic_jsonfiy(goals)
-
-    # response.headers.add("Access-Control-Allow-Origin", "*")
 
     return response
 
@@ -93,9 +90,9 @@ def get_cited_summary(id: int):
 # return jsonify({"msg":"something went wrong"})
 
 @app.route("/api/policy", methods=["GET"])
+@cross_origin()
 def get_policy():
     response = jsonify({"policy": selected_policy})
-    response.headers.add("Access-Control-Allow-Origin", "*")
 
     return response
 
@@ -110,16 +107,15 @@ def update_policy():
         selected_policy = data['policy']
         client.change_policy(selected_policy)
 
-    return jsonify({"policy": selected_policy})
+    response = jsonify({"policy": selected_policy})
 
+    return response
 
 @app.route("/api/html/policy", methods=["GET"])
 @cross_origin()
 def get_policy_html():
     response = jsonify({"policy_html": client.policy_html})
-    # response.headers.add("Access-Control-Allow-Origin", "*")
     return response
-
 
 
 if __name__ == "__main__":
