@@ -47,9 +47,10 @@ export default function AnalysisPage() {
           <div className="flex justify-between mt-3">
             <h3 className="text-lg font-medium">My Goals</h3>
           </div>
+          {goals &&
           <GoalStack
             isEditable={false}
-          />
+          />}
           {goals &&
             <SummaryStack goals={goals} />}
         </div>
