@@ -3,6 +3,7 @@ import { Button } from "@nextui-org/button";
 
 interface GoalStackProps {
   isEditable?: boolean;
+  ratings?: GoalRating[];
 }
 
 interface GoalRating {
@@ -11,43 +12,53 @@ interface GoalRating {
 }
 
 export default function GoalStack({ isEditable = true }: GoalStackProps) {
-  const [goalsList, setGoalsList] = useState<string[]>([]);
-  const [inProcessGoal, setInProcessGoal] = useState<string>("");
+  const [goalsList, setGoalsList] = useState<GoalRating[]>([]);
+  const [inProcessGoal, setInProcessGoal] = useState<GoalRating>({ goal: "", rating: -1 });
   const [isAddingGoal, setIsAddingGoal] = useState<boolean>(false);
+
+  const icons = [
+    "bi bi-check",
+    "bi bi-exclamation-triangle",
+    "bi bi-x"
+  ];
 
   useEffect(() => {
     fetch("http://localhost:5000/api/goals", { method: "GET" })
       .then((response) => response.json())
       .then((data) => {
-        const apiGoals = data.map(({ goal }: GoalRating) => goal);
+        const apiGoals = data.map((goalRating: GoalRating) => goalRating);
 
         setGoalsList(apiGoals);
       });
   }, []);
 
   const addGoal = () => {
-    if (inProcessGoal.trim() !== "") {
+    if (inProcessGoal.goal.trim() !== "") {
       setGoalsList([...goalsList, inProcessGoal]);
 
       fetch("http://localhost:5000/api/goals", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({ goal: inProcessGoal }),
+        body: JSON.stringify({ goal: inProcessGoal })
       });
 
-      setInProcessGoal("");
+      setInProcessGoal({ goal: "", rating: inProcessGoal.rating });
     }
     setIsAddingGoal(false);
   };
 
   const changeInProcessGoal = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInProcessGoal(event.target.value);
+    setInProcessGoal({ goal: event.target.value, rating: inProcessGoal.rating });
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" && isAddingGoal && inProcessGoal.trim() !== "") {
+    if (
+      event.key === "Enter" &&
+      isAddingGoal &&
+      inProcessGoal.goal.trim() !== ""
+    ) {
       addGoal();
       setIsAddingGoal(true);
     }
@@ -60,9 +71,9 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
     fetch("http://localhost:5000/api/goals", {
       method: "DELETE",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ goal: goalsList[index] }),
+      body: JSON.stringify({ goal: goalsList[index] })
     });
   };
 
@@ -75,10 +86,15 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
         {goalsList.map((goal, index) => (
           <li
             key={index}
-            className={`w-full px-4 py-2 border-t border-l border-r border-gray-200 ${index === 0 ? "rounded-t-lg" : ""} ${!isAddingGoal && index === goalsList.length - 1 && "rounded-b-lg border-b"} dark:border-gray-600`}
+            className={`w-full px-2 py-2 border-t border-l border-r border-gray-200 ${index === 0 ? "rounded-t-lg" : ""} ${!isAddingGoal && index === goalsList.length - 1 && "rounded-b-lg border-b"} dark:border-gray-600`}
           >
             <div className="flex items-center gap-2 justify-between">
-              <span>{goal}</span>
+              <div className="flex gap-1">
+                {goal.rating !== -1 && (
+                  <i className={`bi ${icons[goal.rating]}`} />
+                )}
+                <span>{goal.goal}</span>
+              </div>
               {isEditable && (
                 <i
                   className="bi bi-trash3 hover:text-danger-600 hover:cursor-pointer"
@@ -96,7 +112,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
                 autoFocus
                 className="w-full px-2 py-1 border rounded"
                 type="text"
-                value={inProcessGoal}
+                value={inProcessGoal.goal}
                 onBlur={addGoal}
                 onChange={changeInProcessGoal}
                 onKeyDown={handleKeyDown}
