@@ -13,9 +13,9 @@ interface SummarizedGoal {
 }
 
 const citation = ({
-  spans_to_highlight,
-  citation_num,
-}: {
+                    spans_to_highlight,
+                    citation_num
+                  }: {
   spans_to_highlight: number[];
   citation_num: number;
 }) => {
@@ -23,7 +23,7 @@ const citation = ({
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <span
       className="text-blue-500 text-xs cursor-pointer mr-1 align-top"
-      role={"button"}
+      // role={"button"}
       onClick={() => highlight(spans_to_highlight)}
     >
       [{citation_num}]
@@ -32,12 +32,10 @@ const citation = ({
 };
 
 function clearHighlights() {
-  const highlightedElements = document.querySelectorAll(
-    "[style*='background-color: yellow']",
-  );
+  const highlightedElements = document.querySelectorAll(".highlighted");
 
   highlightedElements.forEach((element) => {
-    element.style.backgroundColor = "";
+    element.classList.remove("highlighted");
   });
 }
 
@@ -45,11 +43,14 @@ function highlight(span_to_highlight: number[]) {
   clearHighlights();
   for (let i = 0; i < span_to_highlight.length; i++) {
     const toHighlight = document.getElementById(
-      span_to_highlight[i].toString(),
+      span_to_highlight[i].toString()
     );
+
     if (toHighlight != null) {
       console.log(toHighlight.textContent);
-      toHighlight.style.backgroundColor = "yellow";
+      toHighlight.classList.add(
+        "highlighted"
+      );
       if (i == 0) {
         toHighlight.scrollIntoView({ behavior: "smooth", block: "start" });
       }
@@ -61,12 +62,12 @@ function highlight(span_to_highlight: number[]) {
 
 const fetchSummary = async (id: number) => {
   let response1 = await fetch(`http://localhost:5000/api/summary/${id}`, {
-    method: "GET",
+    method: "GET"
   });
 
   await response1.json();
   let response = await fetch(`http://localhost:5000/api/cite/summary/${id}`, {
-    method: "GET",
+    method: "GET"
   });
   let citeSummary: any = await response.json();
 
@@ -80,9 +81,9 @@ const renderSummary = (summary: CitedSentence[] | string) => {
         {summary.map((sentence, i) => (
           <span key={i}>
             {sentence.sentence}
-           {citation({
+            {citation({
               spans_to_highlight: sentence.quote_locations,
-              citation_num: i + 1,
+              citation_num: i + 1
             })}
           </span>
         ))}
@@ -92,8 +93,8 @@ const renderSummary = (summary: CitedSentence[] | string) => {
 };
 
 export default function SummaryStack({
-  goals,
-}: {
+                                       goals
+                                     }: {
   goals: { goal: string; rating: number }[];
 }) {
   const [summaries, setSummaries] = useState<SummarizedGoal[]>([]);
@@ -109,7 +110,7 @@ export default function SummaryStack({
   return (
     <div>
       {summaries.map(({ goal, cited_sentences }, i) => (
-        <Card shadow={"none"} className="my-4 border" key={i}>
+        <Card key={i} className="my-4 border" shadow={"none"}>
           <CardHeader className="font-semibold text-xl">{goal}</CardHeader>
           <CardBody>{renderSummary(cited_sentences)}</CardBody>
         </Card>
