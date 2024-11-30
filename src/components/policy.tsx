@@ -14,7 +14,7 @@ export default function Policy() {
   }, []);
 
   return (
-    <Card className="p-2">
+    <Card className="p-2 sticky top-48">
       <CardBody id={"policy-text"}>
         <div
           dangerouslySetInnerHTML={{ __html: policyHTML }}
