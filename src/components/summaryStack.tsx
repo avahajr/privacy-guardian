@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardBody } from "@nextui-org/card";
 import { Spinner } from "@nextui-org/spinner";
+
 interface CitedSentence {
   sentence: string;
   quote_locations: number[];
@@ -13,8 +14,8 @@ interface SummarizedGoal {
 }
 
 const colors = ["text-success-600", "text-warning-600", "text-danger-600"];
-
 const icons = ["bi bi-check", "bi bi-exclamation-triangle", "bi bi-x"];
+const sectionLabels = ["Goals Met", "Goals Partially Met", "Goals Not Met"];
 
 const citation = ({
   spans_to_highlight,
@@ -24,10 +25,8 @@ const citation = ({
   citation_num: number;
 }) => {
   return (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <span
       className="text-blue-500 text-xs cursor-pointer mr-1 align-top"
-      // role={"button"}
       onClick={() => highlight(spans_to_highlight)}
     >
       [{citation_num}]
@@ -37,7 +36,6 @@ const citation = ({
 
 function clearHighlights() {
   const highlightedElements = document.querySelectorAll(".highlighted");
-
   highlightedElements.forEach((element) => {
     element.classList.remove("highlighted");
   });
@@ -46,12 +44,8 @@ function clearHighlights() {
 function highlight(span_to_highlight: number[]) {
   clearHighlights();
   for (let i = 0; i < span_to_highlight.length; i++) {
-    const toHighlight = document.getElementById(
-      span_to_highlight[i].toString(),
-    );
-
+    const toHighlight = document.getElementById(span_to_highlight[i].toString());
     if (toHighlight != null) {
-      console.log(toHighlight.textContent);
       toHighlight.classList.add("highlighted");
       if (i == 0) {
         toHighlight.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -66,13 +60,11 @@ const fetchSummary = async (id: number) => {
   let response1 = await fetch(`http://localhost:5000/api/summary/${id}`, {
     method: "GET",
   });
-
   await response1.json();
   let response = await fetch(`http://localhost:5000/api/cite/summary/${id}`, {
     method: "GET",
   });
   let citeSummary: any = await response.json();
-
   return citeSummary;
 };
 
@@ -101,14 +93,19 @@ export default function SummaryStack({
 }) {
   const [summaries, setSummaries] = useState<SummarizedGoal[]>([]);
   const [numGoals, setNumGoals] = useState<number>(1000000);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    goals.forEach((_, index) => {
-      fetchSummary(index).then((summary) => {
-        setSummaries((prevSummaries) => [...prevSummaries, summary]);
-      });
-    });
-  }, []);
+    const fetchAllSummaries = async () => {
+      const fetchedSummaries = await Promise.all(
+        goals.map((_, index) => fetchSummary(index))
+      );
+      setSummaries(fetchedSummaries);
+      setLoading(false);
+    };
+
+    fetchAllSummaries();
+  }, [goals]);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/num/goals", { method: "GET" })
@@ -116,20 +113,33 @@ export default function SummaryStack({
       .then((data) => setNumGoals(data.num_goals));
   }, []);
 
+  const groupedSummaries = summaries.reduce(
+    (acc, summary) => {
+      acc[summary.rating].push(summary);
+      return acc;
+    },
+    [[], [], []] as SummarizedGoal[][]
+  );
+
   return (
     <div>
-      {summaries.map(({ goal, rating, cited_sentences }, i) => (
-        <Card key={i} className="my-4 border p-1" shadow={"none"}>
-          <CardHeader className="font-semibold text-xl -mb-4">
-            <div className="flex gap-1">
-              <i className={`${icons[rating]} ${colors[rating]}`} />
-              <span>{goal}</span>
-            </div>
-          </CardHeader>
-          <CardBody className="px-4">{renderSummary(cited_sentences)}</CardBody>
-        </Card>
+      {groupedSummaries.map((group, rating) => (
+        <div className="mt-10" key={rating}>
+          <h2 className="text-2xl font-bold my-4">{sectionLabels[rating]}</h2>
+          {group.map(({ goal, rating, cited_sentences }, i) => (
+            <Card key={i} className="my-4 border p-1" shadow={"none"}>
+              <CardHeader className="font-semibold text-xl -mb-4">
+                <div className="flex gap-1">
+                  <i className={`${icons[rating]} ${colors[rating]}`} />
+                  <span>{goal}</span>
+                </div>
+              </CardHeader>
+              <CardBody className="px-4">{renderSummary(cited_sentences)}</CardBody>
+            </Card>
+          ))}
+        </div>
       ))}
-      {summaries.length < numGoals && <Spinner />}
+      {loading && <Spinner />}
     </div>
   );
 }
