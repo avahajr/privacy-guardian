@@ -36,6 +36,7 @@ const citation = ({
 
 function clearHighlights() {
   const highlightedElements = document.querySelectorAll(".highlighted");
+
   highlightedElements.forEach((element) => {
     element.classList.remove("highlighted");
   });
@@ -44,7 +45,10 @@ function clearHighlights() {
 function highlight(span_to_highlight: number[]) {
   clearHighlights();
   for (let i = 0; i < span_to_highlight.length; i++) {
-    const toHighlight = document.getElementById(span_to_highlight[i].toString());
+    const toHighlight = document.getElementById(
+      span_to_highlight[i].toString(),
+    );
+
     if (toHighlight != null) {
       toHighlight.classList.add("highlighted");
       if (i == 0) {
@@ -60,11 +64,13 @@ const fetchSummary = async (id: number) => {
   let response1 = await fetch(`http://localhost:5000/api/summary/${id}`, {
     method: "GET",
   });
+
   await response1.json();
   let response = await fetch(`http://localhost:5000/api/cite/summary/${id}`, {
     method: "GET",
   });
   let citeSummary: any = await response.json();
+
   return citeSummary;
 };
 
@@ -86,60 +92,78 @@ const renderSummary = (summary: CitedSentence[] | string) => {
   }
 };
 
+const getGoalCounts = (goals: { goal: string; rating: number }[]) => {
+  let seenGoals = [0, 0, 0];
+
+  goals.forEach((goal) => {
+    seenGoals[goal.rating]++;
+  });
+
+  return seenGoals;
+};
+
 export default function SummaryStack({
   goals,
 }: {
   goals: { goal: string; rating: number }[];
 }) {
   const [summaries, setSummaries] = useState<SummarizedGoal[]>([]);
-  const [numGoals, setNumGoals] = useState<number>(1000000);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [seenGoals, setSeenGoals] = useState<number[]>([0, 0, 0]);
+  const goalCounts = getGoalCounts(goals);
 
   useEffect(() => {
     const fetchAllSummaries = async () => {
-      const fetchedSummaries = await Promise.all(
-        goals.map((_, index) => fetchSummary(index))
-      );
-      setSummaries(fetchedSummaries);
-      setLoading(false);
+      for (let index = 0; index < goals.length; index++) {
+        const fetchedSummary = await fetchSummary(index);
+
+        setSeenGoals((prevSeenGoals) => {
+          const newExpectedGoals = [...prevSeenGoals];
+
+          newExpectedGoals[fetchedSummary.rating]++;
+
+          return newExpectedGoals;
+        });
+        setSummaries((prevSummaries) => [...prevSummaries, fetchedSummary]);
+      }
     };
 
     fetchAllSummaries();
   }, [goals]);
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/num/goals", { method: "GET" })
-      .then((response) => response.json())
-      .then((data) => setNumGoals(data.num_goals));
-  }, []);
-
   const groupedSummaries = summaries.reduce(
     (acc, summary) => {
       acc[summary.rating].push(summary);
+
       return acc;
     },
-    [[], [], []] as SummarizedGoal[][]
+    [[], [], []] as SummarizedGoal[][],
   );
 
   return (
     <div>
       {groupedSummaries.map((group, rating) => (
-        <div className="mt-10" key={rating}>
-          <h2 className="text-2xl font-bold my-4">{sectionLabels[rating]}</h2>
+        <div key={rating} className="mt-10">
+          {goalCounts[rating] > 0 && (
+            <h2 className="text-2xl font-bold my-4">{sectionLabels[rating]}</h2>
+          )}
           {group.map(({ goal, rating, cited_sentences }, i) => (
-            <Card key={i} className="my-4 border p-1" shadow={"none"}>
-              <CardHeader className="font-semibold text-xl -mb-4">
-                <div className="flex gap-1">
-                  <i className={`${icons[rating]} ${colors[rating]}`} />
-                  <span>{goal}</span>
-                </div>
-              </CardHeader>
-              <CardBody className="px-4">{renderSummary(cited_sentences)}</CardBody>
-            </Card>
+            <>
+              <Card key={i} className="my-4 border p-1" shadow={"none"}>
+                <CardHeader className="font-semibold text-xl -mb-4">
+                  <div className="flex gap-1">
+                    <i className={`${icons[rating]} ${colors[rating]}`} />
+                    <span>{goal}</span>
+                  </div>
+                </CardHeader>
+                <CardBody className="px-4">
+                  {renderSummary(cited_sentences)}
+                </CardBody>
+              </Card>
+            </>
           ))}
+          {goalCounts[rating] > 0 && (seenGoals[rating] < goalCounts[rating]) && <Spinner/>}
         </div>
       ))}
-      {loading && <Spinner />}
     </div>
   );
 }

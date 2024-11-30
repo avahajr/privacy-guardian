@@ -120,11 +120,13 @@ def get_policy_html():
     # response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-@app.route("/api/num/goals", methods=["GET"])
+@app.route("/api/count/goals/<rating>", methods=["GET"])
 @cross_origin()
-def get_num_goals():
-    response = jsonify({"num_goals": len(goals)})
+def get_num_goals(rating: int):
+    response = jsonify({"num_goals": len([g for g in goals if g.rating == rating])})
     return response
+
+
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
