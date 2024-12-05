@@ -4,7 +4,7 @@ import { Spinner } from "@nextui-org/spinner";
 
 interface CitedSentence {
   sentence: string;
-  quote_locations: number[];
+  quote_locations: number[][];
 }
 
 interface SummarizedGoal {
@@ -15,7 +15,7 @@ interface SummarizedGoal {
 
 const colors = ["text-success-600", "text-warning-600", "text-danger-600"];
 const icons = ["bi bi-check", "bi bi-exclamation", "bi bi-x"];
-const sectionLabels = ["Goals Met", "Goals Partially Met", "Goals Not Met"];
+const sectionLabels = ["Goals Not Met", "Goals Partially Met", "Goals Met"];
 
 const citation = ({
   spans_to_highlight,
@@ -29,9 +29,34 @@ const citation = ({
       className="text-blue-500 text-xs cursor-pointer mr-1 align-top"
       onClick={() => highlight(spans_to_highlight)}
     >
-      [{citation_num}]
+      [{citation_num + 1}]
     </span>
   );
+};
+
+const renderSummary = (summary: CitedSentence[] | string) => {
+  if (typeof summary == "object") {
+    return (
+      <p>
+        {summary.map((sentence, i) => {
+
+          return (
+            <span key={i}>
+              {sentence.sentence}
+              {sentence.quote_locations.map((group, j) => (
+                <span key={j}>
+                  {citation({
+                    spans_to_highlight: group,
+                    citation_num: i,
+                  })}
+                </span>
+              ))}
+            </span>
+          );
+        })}
+      </p>
+    );
+  }
 };
 
 function clearHighlights() {
@@ -74,24 +99,6 @@ const fetchSummary = async (id: number) => {
   return citeSummary;
 };
 
-const renderSummary = (summary: CitedSentence[] | string) => {
-  if (typeof summary == "object") {
-    return (
-      <p>
-        {summary.map((sentence, i) => (
-          <span key={i}>
-            {sentence.sentence}
-            {citation({
-              spans_to_highlight: sentence.quote_locations,
-              citation_num: i + 1,
-            })}
-          </span>
-        ))}
-      </p>
-    );
-  }
-};
-
 const getGoalCounts = (goals: { goal: string; rating: number }[]) => {
   let seenGoals = [0, 0, 0];
 
@@ -130,14 +137,16 @@ export default function SummaryStack({
     fetchAllSummaries();
   }, [goals]);
 
-  const groupedSummaries = summaries.reduce(
-    (acc, summary) => {
-      acc[summary.rating].push(summary);
+  const groupedSummaries = summaries
+    .reduce(
+      (acc, summary) => {
+        acc[summary.rating].push(summary);
 
-      return acc;
-    },
-    [[], [], []] as SummarizedGoal[][],
-  );
+        return acc;
+      },
+      [[], [], []] as SummarizedGoal[][],
+    )
+    .reverse();
 
   return (
     <div>
