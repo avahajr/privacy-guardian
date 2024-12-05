@@ -18,9 +18,9 @@ const icons = ["bi bi-check", "bi bi-exclamation", "bi bi-x"];
 const sectionLabels = ["Goals Not Met", "Goals Partially Met", "Goals Met"];
 
 const citation = ({
-  spans_to_highlight,
-  citation_num,
-}: {
+                    spans_to_highlight,
+                    citation_num
+                  }: {
   spans_to_highlight: number[];
   citation_num: number;
 }) => {
@@ -29,17 +29,17 @@ const citation = ({
       className="text-blue-500 text-xs cursor-pointer mr-1 align-top"
       onClick={() => highlight(spans_to_highlight)}
     >
-      [{citation_num + 1}]
+      [{citation_num}]
     </span>
   );
 };
 
 const renderSummary = (summary: CitedSentence[] | string) => {
   if (typeof summary == "object") {
+    let citation_num = 0;
     return (
       <p>
         {summary.map((sentence, i) => {
-
           return (
             <span key={i}>
               {sentence.sentence}
@@ -47,7 +47,7 @@ const renderSummary = (summary: CitedSentence[] | string) => {
                 <span key={j}>
                   {citation({
                     spans_to_highlight: group,
-                    citation_num: i,
+                    citation_num: ++citation_num
                   })}
                 </span>
               ))}
@@ -71,7 +71,7 @@ function highlight(span_to_highlight: number[]) {
   clearHighlights();
   for (let i = 0; i < span_to_highlight.length; i++) {
     const toHighlight = document.getElementById(
-      span_to_highlight[i].toString(),
+      span_to_highlight[i].toString()
     );
 
     if (toHighlight != null) {
@@ -87,12 +87,12 @@ function highlight(span_to_highlight: number[]) {
 
 const fetchSummary = async (id: number) => {
   let response1 = await fetch(`http://localhost:5000/api/summary/${id}`, {
-    method: "GET",
+    method: "GET"
   });
 
   await response1.json();
   let response = await fetch(`http://localhost:5000/api/cite/summary/${id}`, {
-    method: "GET",
+    method: "GET"
   });
   let citeSummary: any = await response.json();
 
@@ -110,8 +110,8 @@ const getGoalCounts = (goals: { goal: string; rating: number }[]) => {
 };
 
 export default function SummaryStack({
-  goals,
-}: {
+                                       goals
+                                     }: {
   goals: { goal: string; rating: number }[];
 }) {
   const [summaries, setSummaries] = useState<SummarizedGoal[]>([]);
@@ -144,7 +144,7 @@ export default function SummaryStack({
 
         return acc;
       },
-      [[], [], []] as SummarizedGoal[][],
+      [[], [], []] as SummarizedGoal[][]
     )
     .reverse();
 

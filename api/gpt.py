@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import os
 import re
 
+
 class Rating(BaseModel):
     rating: int
 
@@ -19,8 +20,10 @@ class CitedSentence(BaseModel):
     sentence: str
     quote_locations: list[list[int]]
 
+
 class QuoteLocations(BaseModel):
     locs: list[int]
+
 
 class GoalWithCitedSummary(BaseModel):
     goal: str
@@ -28,12 +31,13 @@ class GoalWithCitedSummary(BaseModel):
     cited_sentences: list[CitedSentence]
 
 
-def split_paragraph_into_sentences(paragraph: GoalSummary ):
+def split_paragraph_into_sentences(paragraph: GoalSummary):
     # Regular expression to match sentence endings
     print(paragraph)
     sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
     sentences = sentence_endings.split(paragraph.summary)
     return sentences
+
 
 def group_consecutive_citations(quote_locations: list[int]) -> list[list[int]]:
     grouped_locations = []
@@ -50,6 +54,7 @@ def group_consecutive_citations(quote_locations: list[int]) -> list[list[int]]:
         grouped_locations.append(current_group)
 
     return grouped_locations
+
 
 class GPT:
     def __init__(self, policy_name: str):
@@ -144,7 +149,8 @@ class GPT:
                 response_format=QuoteLocations,
             )
             quote_location = response.choices[0].message.parsed
-            cited_summary.append(CitedSentence(sentence=sentence, quote_locations=group_consecutive_citations(quote_location.locs)))
+            cited_summary.append(
+                CitedSentence(sentence=sentence, quote_locations=group_consecutive_citations(quote_location.locs)))
 
         return GoalWithCitedSummary(goal=goal.goal, rating=goal.rating, cited_sentences=cited_summary)
 
