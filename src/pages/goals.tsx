@@ -6,9 +6,8 @@ import Policy from "@/components/policy.tsx";
 import GoalStack from "@/components/goalStack.tsx";
 
 export default function GoalsPage() {
-
   return (
-    <DefaultLayout width={7}>
+    <DefaultLayout activeStep={2} width={7}>
       <section className="flex gap-4 py-8 md:py-10">
         <div className="flex flex-col gap-2 mr-10 w-full">
           <Link className="w-max" color="foreground" href="/" underline="hover">

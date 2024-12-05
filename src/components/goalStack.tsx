@@ -13,14 +13,13 @@ interface GoalRating {
 
 export default function GoalStack({ isEditable = true }: GoalStackProps) {
   const [goalsList, setGoalsList] = useState<GoalRating[]>([]);
-  const [inProcessGoal, setInProcessGoal] = useState<GoalRating>({ goal: "", rating: -1 });
+  const [inProcessGoal, setInProcessGoal] = useState<GoalRating>({
+    goal: "",
+    rating: -1,
+  });
   const [isAddingGoal, setIsAddingGoal] = useState<boolean>(false);
 
-  const icons = [
-    "bi bi-check",
-    "bi bi-exclamation",
-    "bi bi-x"
-  ];
+  const icons = ["bi bi-check", "bi bi-exclamation", "bi bi-x"];
   const colors = ["text-success-600", "text-warning-600", "text-danger-600"];
 
   useEffect(() => {
@@ -40,9 +39,9 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
       fetch("http://localhost:5000/api/goals", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ goal: inProcessGoal })
+        body: JSON.stringify({ goal: inProcessGoal }),
       });
 
       setInProcessGoal({ goal: "", rating: inProcessGoal.rating });
@@ -51,7 +50,10 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
   };
 
   const changeInProcessGoal = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInProcessGoal({ goal: event.target.value, rating: inProcessGoal.rating });
+    setInProcessGoal({
+      goal: event.target.value,
+      rating: inProcessGoal.rating,
+    });
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -72,9 +74,9 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
     fetch("http://localhost:5000/api/goals", {
       method: "DELETE",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ goal: goalsList[index] })
+      body: JSON.stringify({ goal: goalsList[index] }),
     });
   };
 
@@ -92,7 +94,9 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
             <div className="flex items-center gap-2 justify-between">
               <div className="flex gap-1 items-center">
                 {goal.rating !== -1 && (
-                  <i className={`bi ${icons[goal.rating]} ${colors[goal.rating]} text-lg`} />
+                  <i
+                    className={`bi ${icons[goal.rating]} ${colors[goal.rating]} text-lg`}
+                  />
                 )}
                 <span>{goal.goal}</span>
               </div>

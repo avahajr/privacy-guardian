@@ -161,7 +161,9 @@ export default function SummaryStack({
               </Card>
             </>
           ))}
-          {goalCounts[rating] > 0 && (seenGoals[rating] < goalCounts[rating]) && <Spinner className="self-center"/>}
+          {goalCounts[rating] > 0 && seenGoals[rating] < goalCounts[rating] && (
+            <Spinner className="self-center" />
+          )}
         </div>
       ))}
     </div>

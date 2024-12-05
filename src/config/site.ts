@@ -38,5 +38,5 @@ export const siteConfig = {
     discord: "https://discord.gg/9b6yyZKmH4",
     sponsor: "https://patreon.com/jrgarciadev",
   },
-  policies: ["Apple", "Google", "Proton", "Reddit", "OpenAI"]
+  policies: ["Apple", "Google", "Proton", "Reddit", "OpenAI"],
 };

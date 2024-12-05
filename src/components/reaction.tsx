@@ -8,6 +8,7 @@ export default function Reaction({ goals }: ReactionProps) {
   const reactions = ["Nice!", "Not too shabby!", "Ruh roh!"];
   const [reaction, setReaction] = useState<string>("");
   const [numMet, setNumMet] = useState<number>(0);
+
   useEffect(() => {
     const seenGoals = [0, 0, 0];
 
@@ -17,6 +18,7 @@ export default function Reaction({ goals }: ReactionProps) {
 
     const totalGoals = goals.length;
     const metGoals = seenGoals[0];
+
     setNumMet(metGoals);
     const metPercentage = metGoals / totalGoals;
 
@@ -32,7 +34,12 @@ export default function Reaction({ goals }: ReactionProps) {
   return (
     <div className="mt-3">
       <div className="font-semibold text-lg">{reaction}</div>
-      <div className="text-sm"><span className="font-medium" >{numMet} out of {goals.length}</span> of your goals were completely met.</div>
+      <div className="text-sm">
+        <span className="font-medium">
+          {numMet} out of {goals.length}
+        </span>{" "}
+        of your goals were completely met.
+      </div>
     </div>
   );
 }

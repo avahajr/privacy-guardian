@@ -27,9 +27,9 @@ export default function IndexPage() {
   const [isInvalid, setIsInvalid] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/policy",
-      { method: "GET" }).then((response) =>
-      response.json()).then((data) => {
+    fetch("http://localhost:5000/api/policy", { method: "GET" })
+      .then((response) => response.json())
+      .then((data) => {
         console.log(data);
         setSelectedPolicy(data.policy);
       });
@@ -43,12 +43,13 @@ export default function IndexPage() {
       const response = await fetch("http://localhost:5000/api/policy", {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ policy })
+        body: JSON.stringify({ policy }),
       });
 
       const data = await response.json();
+
       console.log(data);
     }
   };
@@ -60,7 +61,7 @@ export default function IndexPage() {
   };
 
   return (
-    <DefaultLayout width={5}>
+    <DefaultLayout activeStep={1} width={5}>
       <section className="flex justify-between py-8 md:py-10">
         {masthead}
         <div className="flex flex-col justify-end">
@@ -73,9 +74,9 @@ export default function IndexPage() {
             isInvalid={isInvalid}
             label={"Policy"}
             placeholder="Select a policy..."
+            selectedKeys={selectedPolicy ? [selectedPolicy] : []}
             size="lg"
             variant={"bordered"}
-            selectedKeys={[selectedPolicy]}
             onChange={(e) => handlePolicyChange(e.target.value)}
           >
             {siteConfig.policies.map((policy) => (
