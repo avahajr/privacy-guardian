@@ -59,7 +59,7 @@ function BreakdownElement({ forRating, goals }: BreakdownElementProps) {
 }
 
 export default function Breakdown({ goals }: BreakdownProps) {
-   console.log(goals);
+  console.log(goals);
 
   return (
     <div className={"flex justify-between"}>
