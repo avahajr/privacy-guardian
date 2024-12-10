@@ -10,7 +10,7 @@ export default function GoalsPage() {
     <DefaultLayout activeStep={2} width={7}>
       <section className="flex gap-4 py-8 md:py-10">
         <div className="flex flex-col gap-2 mr-10 w-full">
-          <Link className="w-max" color="foreground" href="/" underline="hover">
+          <Link className="w-max font-medium text-lg" color="foreground" href="/" underline="hover">
             <i className="bi bi-arrow-left pr-1" />
             Back to policy selection{" "}
           </Link>
@@ -21,10 +21,6 @@ export default function GoalsPage() {
           <div className="text-md font-medium text-default-500 -mt-1 mb-3">We'll use these goals to give you a personalized evaluation of the policy.</div>
           <div className="flex justify-between">
             <h3 className="text-xl font-medium">My Goals</h3>
-            {/*<div className="text-default-400 flex gap-1">*/}
-            {/*  <i className="bi bi-magic" />*/}
-            {/*  <span>Suggest...</span>*/}
-            {/*</div>*/}
           </div>
 
           <GoalStack isEditable={true} />

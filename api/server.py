@@ -1,4 +1,3 @@
-from crypt import methods
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
@@ -6,7 +5,7 @@ from flask_cors import CORS, cross_origin
 from gpt import GPT, GoalSummary, GoalWithCitedSummary
 
 app = Flask(__name__)
-CORS(app, origins="http://localhost:5173")
+CORS(app, origins="*")
 
 selected_policy = "Apple"
 client = GPT(selected_policy)
@@ -14,6 +13,9 @@ client = GPT(selected_policy)
 goals = [GoalSummary(goal=goal) for goal in
          ["Don't sell my data", "Don't give my data to law enforcement", "Allow me to delete my data"]]
 
+def allow_cors(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 def pydantic_jsonfiy(obj):
     if isinstance(obj, list):
@@ -23,77 +25,89 @@ def pydantic_jsonfiy(obj):
 
 
 @app.route("/api/goals", methods=["GET"])
+
 def get_goals():
     global goals
     response = pydantic_jsonfiy(goals)
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
+    return allow_cors(response)
 
 
 @app.route("/api/goals", methods=["POST"])
+
 def add_goal():
     global goals
     data = request.get_json()
     goals.append(GoalSummary(goal=data['goal']['goal']))
     response = pydantic_jsonfiy(goals)
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
+    return allow_cors(response)
 
 
 @app.route("/api/goals", methods=["DELETE"])
+
 def delete_goal():
     global goals
     data = request.get_json()
     goals = [goal for goal in goals if goal.goal != data['goal']['goal']]
-    return pydantic_jsonfiy(goals)
+    return allow_cors(pydantic_jsonfiy(goals))
 
 
 @app.route("/api/goals/rating", methods=["GET"])
+
 def get_goal_ratings():
     global client
     global goals
-    goals = client.rate_goals(goals)
+    if goals[0].rating is None:
+        goals = client.rate_goals(goals)
+
     goals.sort(key=lambda x: x.rating, reverse=True)
     response = pydantic_jsonfiy(goals)
 
-    return response
+    return allow_cors(response)
 
 
 @app.route("/api/summary/<id>", methods=["GET"])
 def get_summary(id: int):
     global client
     global goals
-    summary = client.summarize_goal(goals[int(id)])
-    response = pydantic_jsonfiy(summary)
-    goals[int(id)] = summary
-    # response.headers.add("Access-Control-Allow-Origin", "*")
+    if int(id) >= len(goals):
+        return jsonify({"msg": "goal not found"})
 
-    return response
+    if isinstance(goals[int(id)], GoalSummary) and goals[int(id)].summary is None:
+        summary = client.summarize_goal(goals[int(id)])
+        goals[int(id)] = summary
 
+    response = pydantic_jsonfiy(goals[int(id)])
+
+    return allow_cors(response)
 
 @app.route("/api/cite/summary/<id>", methods=["GET"])
+
 def get_cited_summary(id: int):
     global client
     global goals
 
+    # if the goal has already been cited, return it
+    if isinstance(goals[int(id)], GoalWithCitedSummary):
+        return pydantic_jsonfiy(goals[int(id)])
+
     cited_summary = client.cite_summary(goals[int(id)])
+
     goals[int(id)] = cited_summary
     response = pydantic_jsonfiy(cited_summary)
-    # response.headers.add("Access-Control-Allow-Origin", "*")
 
-    return response
+    return allow_cors(response)
 
-
-# return jsonify({"msg":"something went wrong"})
 
 @app.route("/api/policy", methods=["GET"])
+
 def get_policy():
     response = jsonify({"policy": selected_policy})
 
-    return response
+    return allow_cors(response)
 
 
 @app.route("/api/policy", methods=["PUT"])
+
 def update_policy():
     global selected_policy
     global client
@@ -104,15 +118,17 @@ def update_policy():
 
     response = jsonify({"policy": selected_policy})
 
-    return response
+    return allow_cors(response)
 
 
 @app.route("/api/html/policy", methods=["GET"])
+
 def get_policy_html():
     response = jsonify({"policy_html": client.policy_html})
     return response
 
 @app.route("/api/goals/reset", methods=["DELETE"])
+
 def reset_goals():
     global goals
     goals = [GoalSummary(goal=goal) for goal in

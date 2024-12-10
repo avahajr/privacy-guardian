@@ -27,7 +27,7 @@ export default function AnalysisPage() {
       <section className="flex gap-4 py-8 md:py-10">
         <div className="flex flex-col gap-2 mr-10 w-full">
           <Link
-            className="w-max"
+            className="w-max font-medium text-lg"
             color="foreground"
             href="/goals"
             underline="hover"

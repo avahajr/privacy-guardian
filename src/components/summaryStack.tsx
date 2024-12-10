@@ -37,6 +37,7 @@ const citation = ({
 const renderSummary = (summary: CitedSentence[] | string) => {
   if (typeof summary == "object") {
     let citation_num = 0;
+
     return (
       <p>
         {summary.map((sentence, i) => {
@@ -121,6 +122,7 @@ export default function SummaryStack({
   useEffect(() => {
     const fetchAllSummaries = async () => {
       for (let index = 0; index < goals.length; index++) {
+
         const fetchedSummary = await fetchSummary(index);
 
         setSeenGoals((prevSeenGoals) => {
