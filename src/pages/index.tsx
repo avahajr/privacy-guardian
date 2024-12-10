@@ -37,6 +37,10 @@ export default function IndexPage() {
 
   const handlePolicyChange = async (policy: string) => {
     if (policy) {
+      fetch("http://localhost:5000/api/goals/reset", {
+        method: "DELETE",
+      }).then((resetGoals) => resetGoals.json());
+
       setSelectedPolicy(policy);
       setIsInvalid(false);
 

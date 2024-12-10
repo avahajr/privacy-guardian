@@ -1,3 +1,5 @@
+from crypt import methods
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 
@@ -110,6 +112,12 @@ def get_policy_html():
     response = jsonify({"policy_html": client.policy_html})
     return response
 
+@app.route("/api/goals/reset", methods=["DELETE"])
+def reset_goals():
+    global goals
+    goals = [GoalSummary(goal=goal) for goal in
+             ["Don't sell my data", "Don't give my data to law enforcement", "Allow me to delete my data"]]
+    return pydantic_jsonfiy(goals)
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
