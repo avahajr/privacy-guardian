@@ -44,7 +44,7 @@ def add_goal():
 def delete_goal():
     global goals
     data = request.get_json()
-    goals = [goal for goal in goals if goal.goal != data['goal']]
+    goals = [goal for goal in goals if goal.goal != data['goal']['goal']]
     return pydantic_jsonfiy(goals)
 
 
