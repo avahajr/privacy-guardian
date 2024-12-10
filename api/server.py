@@ -4,7 +4,7 @@ from flask_cors import CORS, cross_origin
 from gpt import GPT, GoalSummary, GoalWithCitedSummary
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="http://localhost:5173")
 
 selected_policy = "Apple"
 client = GPT(selected_policy)
@@ -29,7 +29,6 @@ def get_goals():
 
 
 @app.route("/api/goals", methods=["POST"])
-@cross_origin()
 def add_goal():
     global goals
     data = request.get_json()
@@ -40,7 +39,6 @@ def add_goal():
 
 
 @app.route("/api/goals", methods=["DELETE"])
-@cross_origin()
 def delete_goal():
     global goals
     data = request.get_json()
@@ -49,7 +47,6 @@ def delete_goal():
 
 
 @app.route("/api/goals/rating", methods=["GET"])
-@cross_origin()
 def get_goal_ratings():
     global client
     global goals
@@ -61,7 +58,6 @@ def get_goal_ratings():
 
 
 @app.route("/api/summary/<id>", methods=["GET"])
-@cross_origin()
 def get_summary(id: int):
     global client
     global goals
@@ -74,7 +70,6 @@ def get_summary(id: int):
 
 
 @app.route("/api/cite/summary/<id>", methods=["GET"])
-@cross_origin()
 def get_cited_summary(id: int):
     global client
     global goals
@@ -90,7 +85,6 @@ def get_cited_summary(id: int):
 # return jsonify({"msg":"something went wrong"})
 
 @app.route("/api/policy", methods=["GET"])
-@cross_origin()
 def get_policy():
     response = jsonify({"policy": selected_policy})
 
@@ -98,7 +92,6 @@ def get_policy():
 
 
 @app.route("/api/policy", methods=["PUT"])
-@cross_origin()
 def update_policy():
     global selected_policy
     global client
@@ -111,8 +104,8 @@ def update_policy():
 
     return response
 
+
 @app.route("/api/html/policy", methods=["GET"])
-@cross_origin()
 def get_policy_html():
     response = jsonify({"policy_html": client.policy_html})
     return response
