@@ -16,7 +16,12 @@ export default function DefaultLayout({
       <main
         className={`container mx-auto max-w-${width}xl px-6 flex-grow pt-16`}
       >
-        <HorizontalStepper activeStep={activeStep} className={"max-w-5xl pb-5"}/>
+        {activeStep > 1 && (
+          <HorizontalStepper
+            activeStep={activeStep}
+            className={"max-w-5xl pb-5"}
+          />
+        )}
         {children}
       </main>
     </div>

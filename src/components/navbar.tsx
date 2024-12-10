@@ -26,6 +26,7 @@ export const Navbar = () => {
             href="/"
           >
             <PrivacyGuardianLogo size={36} />
+            <div className="text-xl font-semibold">Privacy Guardian</div>
           </Link>
         </NavbarBrand>
         <div className="hidden lg:flex gap-4 justify-start ml-2">
@@ -51,11 +52,6 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
-          <Link href={"/"} title="Home">
-            <div className="text-default-600 text-2xl font-semibold">
-              Privacy Guardian
-            </div>
-          </Link>
           <ThemeSwitch />
         </NavbarItem>
       </NavbarContent>

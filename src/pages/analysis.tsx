@@ -1,5 +1,4 @@
 import { Link } from "@nextui-org/link";
-import { Button } from "@nextui-org/button";
 import { Spinner } from "@nextui-org/spinner";
 import { useEffect, useState } from "react";
 
@@ -40,10 +39,7 @@ export default function AnalysisPage() {
         </div>
         <div className={"flex flex-col gap-2 w-full min-h-96"}>
           <div className="flex justify-between mb-4">
-            <h3 className="font-semibold text-2xl">Goal Breakdown</h3>
-            <Button size="sm" variant="ghost">
-              Re-roll analysis
-            </Button>
+            <h3 className="font-semibold text-3xl">Your privacy report</h3>
           </div>
           {goals ? <Breakdown goals={goals} /> : <Spinner />}
 

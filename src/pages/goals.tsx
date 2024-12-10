@@ -17,13 +17,16 @@ export default function GoalsPage() {
           <Policy />
         </div>
         <div className={"flex flex-col gap-2 w-full min-h-96"}>
+          <div className="text-4xl font-semibold">Now, set some privacy goals.</div>
+          <div className="text-md font-medium text-default-500 -mt-1 mb-3">We'll use these goals to give you a personalized evaluation of the policy.</div>
           <div className="flex justify-between">
             <h3 className="text-xl font-medium">My Goals</h3>
-            <div className="text-default-400 flex gap-1">
-              <i className="bi bi-magic" />
-              <span>Suggest...</span>
-            </div>
+            {/*<div className="text-default-400 flex gap-1">*/}
+            {/*  <i className="bi bi-magic" />*/}
+            {/*  <span>Suggest...</span>*/}
+            {/*</div>*/}
           </div>
+
           <GoalStack isEditable={true} />
           <div className="flex justify-end mt-5">
             <Button as={Link} color="secondary" href="/breakdown">
