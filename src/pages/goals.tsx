@@ -10,7 +10,7 @@ export default function GoalsPage() {
     <DefaultLayout activeStep={2} width={7}>
       <section className="flex gap-4 py-8 md:py-10">
         <div className="flex flex-col gap-2 mr-10 w-full">
-          <Link className="w-max font-medium text-lg" color="foreground" href="/" underline="hover">
+          <Link className="w-max font-medium text-lg pb-1" color="foreground" href="/" underline="hover">
             <i className="bi bi-arrow-left pr-1" />
             Back to policy selection{" "}
           </Link>

@@ -26,7 +26,7 @@ export const Navbar = () => {
             href="/"
           >
             <PrivacyGuardianLogo size={36} />
-            <div className="text-xl font-semibold">Privacy Guardian</div>
+            <div className="text-2xl font-semibold">Privacy Guardian</div>
           </Link>
         </NavbarBrand>
         <div className="hidden lg:flex gap-4 justify-start ml-2">

@@ -52,7 +52,6 @@ def delete_goal():
 
 
 @app.route("/api/goals/rating", methods=["GET"])
-
 def get_goal_ratings():
     global client
     global goals
