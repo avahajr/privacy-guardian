@@ -3,7 +3,7 @@
     "api/server.py": {
       "memory": 3009,
       "maxDuration": 30,
-      "includeFiles": "api/**",
+      "includeFiles": "api/**"
     }
   },
   "rewrites": [
