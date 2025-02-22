@@ -1,10 +1,10 @@
-
-from flask import Flask, request, jsonify
-from flask_cors import CORS, cross_origin
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 
 from gpt import GPT, GoalSummary, GoalWithCitedSummary
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../dist", static_folder="../dist/assets",
+            static_url_path="/assets")
 CORS(app, origins="*")
 
 selected_policy = "Apple"
@@ -13,9 +13,11 @@ client = GPT(selected_policy)
 goals = [GoalSummary(goal=goal) for goal in
          ["Don't sell my data", "Don't give my data to law enforcement", "Allow me to delete my data"]]
 
+
 def allow_cors(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
+
 
 def pydantic_jsonfiy(obj):
     if isinstance(obj, list):
@@ -24,8 +26,12 @@ def pydantic_jsonfiy(obj):
     return jsonify(obj.model_dump())
 
 
-@app.route("/api/goals", methods=["GET"])
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return render_template("index.html")
 
+@app.route("/api/goals", methods=["GET"])
 def get_goals():
     global goals
     response = pydantic_jsonfiy(goals)
@@ -33,7 +39,6 @@ def get_goals():
 
 
 @app.route("/api/goals", methods=["POST"])
-
 def add_goal():
     global goals
     data = request.get_json()
@@ -43,7 +48,6 @@ def add_goal():
 
 
 @app.route("/api/goals", methods=["DELETE"])
-
 def delete_goal():
     global goals
     data = request.get_json()
@@ -79,8 +83,8 @@ def get_summary(id: int):
 
     return allow_cors(response)
 
-@app.route("/api/cite/summary/<id>", methods=["GET"])
 
+@app.route("/api/cite/summary/<id>", methods=["GET"])
 def get_cited_summary(id: int):
     global client
     global goals
@@ -98,7 +102,6 @@ def get_cited_summary(id: int):
 
 
 @app.route("/api/policy", methods=["GET"])
-
 def get_policy():
     response = jsonify({"policy": selected_policy})
 
@@ -106,7 +109,6 @@ def get_policy():
 
 
 @app.route("/api/policy", methods=["PUT"])
-
 def update_policy():
     global selected_policy
     global client
@@ -121,18 +123,19 @@ def update_policy():
 
 
 @app.route("/api/html/policy", methods=["GET"])
-
 def get_policy_html():
     response = jsonify({"policy_html": client.policy_html})
     return response
 
-@app.route("/api/goals/reset", methods=["DELETE"])
 
+@app.route("/api/goals/reset", methods=["DELETE"])
 def reset_goals():
     global goals
     goals = [GoalSummary(goal=goal) for goal in
              ["Don't sell my data", "Don't give my data to law enforcement", "Allow me to delete my data"]]
     return pydantic_jsonfiy(goals)
 
+
+
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    app.run(port=8000, debug=True)

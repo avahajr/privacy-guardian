@@ -18,15 +18,15 @@ const icons = ["bi bi-check", "bi bi-exclamation", "bi bi-x"];
 const sectionLabels = ["Goals Not Met", "Goals Partially Met", "Goals Met"];
 
 const citation = ({
-  spans_to_highlight,
-  citation_num,
-}: {
+                    spans_to_highlight,
+                    citation_num
+                  }: {
   spans_to_highlight: number[];
   citation_num: number;
 }) => {
   return (
     <span
-      className="text-blue-500 text-xs cursor-pointer align-top"
+      className="text-blue-500 text-xs cursor-pointer mr-1 align-top"
       onClick={() => highlight(spans_to_highlight)}
     >
       [{citation_num}]
@@ -44,16 +44,14 @@ const renderSummary = (summary: CitedSentence[] | string) => {
           return (
             <span key={i}>
               {sentence.sentence}
-              <span className="mr-1">
-                {sentence.quote_locations.map((group, j) => (
-                  <span key={j}>
-                    {citation({
-                      spans_to_highlight: group,
-                      citation_num: ++citation_num,
-                    })}
-                  </span>
-                ))}
-              </span>
+              {sentence.quote_locations.map((group, j) => (
+                <span key={j}>
+                  {citation({
+                    spans_to_highlight: group,
+                    citation_num: ++citation_num
+                  })}
+                </span>
+              ))}
             </span>
           );
         })}
@@ -74,7 +72,7 @@ function highlight(span_to_highlight: number[]) {
   clearHighlights();
   for (let i = 0; i < span_to_highlight.length; i++) {
     const toHighlight = document.getElementById(
-      span_to_highlight[i].toString(),
+      span_to_highlight[i].toString()
     );
 
     if (toHighlight != null) {
@@ -89,13 +87,13 @@ function highlight(span_to_highlight: number[]) {
 }
 
 const fetchSummary = async (id: number) => {
-  let response1 = await fetch(`/api/summary/${id}`, {
-    method: "GET",
+  let response1 = await fetch(`http://localhost:5000/api/summary/${id}`, {
+    method: "GET"
   });
 
   await response1.json();
-  let response = await fetch(`/api/cite/summary/${id}`, {
-    method: "GET",
+  let response = await fetch(`http://localhost:5000/api/cite/summary/${id}`, {
+    method: "GET"
   });
   let citeSummary: any = await response.json();
 
@@ -113,8 +111,8 @@ const getGoalCounts = (goals: { goal: string; rating: number }[]) => {
 };
 
 export default function SummaryStack({
-  goals,
-}: {
+                                       goals
+                                     }: {
   goals: { goal: string; rating: number }[];
 }) {
   const [summaries, setSummaries] = useState<SummarizedGoal[]>([]);
@@ -124,6 +122,7 @@ export default function SummaryStack({
   useEffect(() => {
     const fetchAllSummaries = async () => {
       for (let index = 0; index < goals.length; index++) {
+
         const fetchedSummary = await fetchSummary(index);
 
         setSeenGoals((prevSeenGoals) => {
@@ -147,7 +146,7 @@ export default function SummaryStack({
 
         return acc;
       },
-      [[], [], []] as SummarizedGoal[][],
+      [[], [], []] as SummarizedGoal[][]
     )
     .reverse();
 
@@ -156,12 +155,7 @@ export default function SummaryStack({
       {groupedSummaries.map((group, rating) => (
         <div key={rating} className="mt-5 flex flex-col">
           {goalCounts[rating] > 0 && (
-            <>
-              <h2 className="text-2xl font-bold mt-4">
-                {sectionLabels[rating]}
-              </h2>
-              <div className="text-default-400 mb-4">Click on a citation to see it highlighted in the policy.</div>
-            </>
+            <h2 className="text-2xl font-bold my-4">{sectionLabels[rating]}</h2>
           )}
           {group.map(({ goal, rating, cited_sentences }, i) => (
             <>
