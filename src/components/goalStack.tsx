@@ -23,7 +23,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
   const colors = ["text-success-600", "text-warning-600", "text-danger-600"];
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/goals", { method: "GET" })
+    fetch("/api/goals", { method: "GET" })
       .then((response) => response.json())
       .then((data) => {
         const apiGoals = data.map((goalRating: GoalRating) => goalRating);
@@ -36,7 +36,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
     if (inProcessGoal.goal.trim() !== "") {
       setGoalsList([...goalsList, inProcessGoal]);
 
-      fetch("http://localhost:5000/api/goals", {
+      fetch("/api/goals", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
