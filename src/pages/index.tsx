@@ -27,7 +27,7 @@ export default function IndexPage() {
   const [isInvalid, setIsInvalid] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/policy", { method: "GET" })
+    fetch("/api/policy", { method: "GET" })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -37,14 +37,14 @@ export default function IndexPage() {
 
   const handlePolicyChange = async (policy: string) => {
     if (policy) {
-      fetch("http://localhost:5000/api/goals/reset", {
+      fetch("/api/goals/reset", {
         method: "DELETE",
       }).then((resetGoals) => resetGoals.json());
 
       setSelectedPolicy(policy);
       setIsInvalid(false);
 
-      const response = await fetch("http://localhost:5000/api/policy", {
+      const response = await fetch("/api/policy", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -12,6 +12,7 @@
       "destination": "/api/server.py"
     }
   ],
-  "installCommand": "npm install && pip install -r requirements.txt",
-  "buildCommand": "npm run build && mv dist api/dist"
+  "installCommand": "npm install",
+  "buildCommand": "npm run build && mv dist api/dist",
+  "outputDirectory": "api/dist"
 }

@@ -8,7 +8,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from api.gpt import GPT, GoalSummary, GoalWithCitedSummary
 
-app = Flask(__name__, template_folder="../dist", static_folder="../dist/assets",
+env = os.getenv("ENV")
+
+template_folder = "../dist" if env == "dev" else "/"
+static_folder = "../dist/assets" if env == "dev" else "/assets"
+
+
+app = Flask(__name__, template_folder=template_folder, static_folder=static_folder,
             static_url_path="/assets")
 
 CORS(app, origins="*")
@@ -144,4 +150,4 @@ def reset_goals():
 
 
 if __name__ == "__main__":
-    app.run(port=8000, debug=True)
+    app.run(port=8000)

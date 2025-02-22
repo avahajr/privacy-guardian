@@ -15,7 +15,7 @@ export default function AnalysisPage() {
   );
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/goals/rating", { method: "GET" })
+    fetch("/api/goals/rating", { method: "GET" })
       .then((response) => response.json())
       .then((data) => {
         setGoals(data);
