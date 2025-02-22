@@ -87,12 +87,12 @@ function highlight(span_to_highlight: number[]) {
 }
 
 const fetchSummary = async (id: number) => {
-  let response1 = await fetch(`http://localhost:5000/api/summary/${id}`, {
+  let response1 = await fetch(`/api/summary/${id}`, {
     method: "GET"
   });
 
   await response1.json();
-  let response = await fetch(`http://localhost:5000/api/cite/summary/${id}`, {
+  let response = await fetch(`/api/cite/summary/${id}`, {
     method: "GET"
   });
   let citeSummary: any = await response.json();

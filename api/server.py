@@ -5,6 +5,7 @@ from gpt import GPT, GoalSummary, GoalWithCitedSummary
 
 app = Flask(__name__, template_folder="../dist", static_folder="../dist/assets",
             static_url_path="/assets")
+
 CORS(app, origins="*")
 
 selected_policy = "Apple"
@@ -30,6 +31,7 @@ def pydantic_jsonfiy(obj):
 @app.route('/<path:path>')
 def catch_all(path):
     return render_template("index.html")
+
 
 @app.route("/api/goals", methods=["GET"])
 def get_goals():
@@ -134,7 +136,6 @@ def reset_goals():
     goals = [GoalSummary(goal=goal) for goal in
              ["Don't sell my data", "Don't give my data to law enforcement", "Allow me to delete my data"]]
     return pydantic_jsonfiy(goals)
-
 
 
 if __name__ == "__main__":

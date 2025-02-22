@@ -6,7 +6,7 @@ export default function Policy() {
   const [policyHTML, setPolicyHTML] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/html/policy", { method: "GET" })
+    fetch("/api/html/policy", { method: "GET" })
       .then((response) => response.json())
       .then((data) => {
         setPolicyHTML(data.policy_html);

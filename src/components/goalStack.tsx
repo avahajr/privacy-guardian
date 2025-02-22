@@ -71,7 +71,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
     const newGoalsList = goalsList.filter((_, i) => i !== index);
 
     setGoalsList(newGoalsList);
-    fetch("http://localhost:5000/api/goals", {
+    fetch("/api/goals", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

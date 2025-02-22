@@ -2,8 +2,8 @@ import os
 from bs4 import BeautifulSoup
 
 # Directory containing the HTML files
-input_dir = '/Users/ava/github/gen-ai/react-prototype/public/policies'
-output_dir = '/Users/ava/github/gen-ai/react-prototype/public/policies'
+input_dir = '../public/policies'
+output_dir = '../public/policies'
 
 # Ensure the output directory exists
 os.makedirs(output_dir, exist_ok=True)

@@ -9,10 +9,6 @@
     {
       "source": "/(.*)",
       "destination": "/"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "server.py"
     }
   ]
 }
