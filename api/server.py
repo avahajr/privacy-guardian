@@ -1,5 +1,11 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+import sys
+import os
+
+# include /api in the path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 
 from gpt import GPT, GoalSummary, GoalWithCitedSummary
 
