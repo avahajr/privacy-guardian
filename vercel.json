@@ -11,5 +11,5 @@
       "destination": "/"
     }
   ],
-  "buildCommand": "npm run build"
+  "buildCommand": "npm install && npm run build"
 }
