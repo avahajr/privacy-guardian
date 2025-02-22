@@ -8,7 +8,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/"
+      "destination": "/api/server.py"
     }
   ],
   "buildCommand": "npm install && npm run build"
