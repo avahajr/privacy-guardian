@@ -6,8 +6,7 @@ import os
 # include /api in the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-
-from gpt import GPT, GoalSummary, GoalWithCitedSummary
+from api.gpt import GPT, GoalSummary, GoalWithCitedSummary
 
 app = Flask(__name__, template_folder="../dist", static_folder="../dist/assets",
             static_url_path="/assets")
