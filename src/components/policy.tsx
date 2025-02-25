@@ -1,12 +1,18 @@
 import { Card, CardBody } from "@nextui-org/card";
 import { useEffect, useState } from "react";
-import "../styles/policy.css";
+
+import { apiRequest } from "@/helpers/requests";
+import { useStorage } from "@/hooks/useStorage.ts";
 
 export default function Policy() {
   const [policyHTML, setPolicyHTML] = useState([]);
+  const { goals, policy } = useStorage();
 
   useEffect(() => {
-    fetch("/api/html/policy", { method: "GET" })
+    const goalAndPolicy =
+      goals && policy ? { goals: goals, policy: policy } : {};
+
+    apiRequest({ endpoint: "html/policy", method: "POST", ...goalAndPolicy })
       .then((response) => response.json())
       .then((data) => {
         setPolicyHTML(data.policy_html);

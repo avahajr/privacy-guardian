@@ -77,10 +77,10 @@ class GPT:
             "content": f"Here is the privacy policy for {self.policy_name}: \n{self.policy_html}"}
 
     def retrieve_policy_text(self):
-        if __name__ != "__main__":
+        try:
             with open(f'public/policies/{self.policy_name.lower()}.html', 'r') as f:
                 policy_text = f.read()
-        if __name__ == "__main__":
+        except FileNotFoundError:
             with open(f'../public/policies/{self.policy_name.lower()}.html', 'r') as f:
                 policy_text = f.read()
         return policy_text
@@ -103,6 +103,7 @@ class GPT:
             )
             goal_rating = response.choices[0].message.parsed
             goal_ratings.append(GoalSummary(goal=goal.goal, rating=goal_rating.rating))
+
         return goal_ratings
 
     def summarize_goal(self, goal: GoalSummary) -> GoalSummary:
@@ -133,6 +134,7 @@ class GPT:
         return GoalSummary(goal=goal.goal, rating=goal.rating, summary=response.choices[0].message.content)
 
     def cite_summary(self, goal: GoalSummary) -> GoalWithCitedSummary:
+        print(goal.summary)
         sentences = split_paragraph_into_sentences(goal)
         cited_summary = []
         for sentence in sentences:

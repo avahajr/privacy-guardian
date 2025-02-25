@@ -1,50 +1,52 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@nextui-org/button";
+
+import { Goal } from "@/types";
 
 interface GoalStackProps {
   isEditable?: boolean;
-  ratings?: GoalRating[];
-}
-
-interface GoalRating {
-  goal: string;
-  rating: number;
+  ratings?: Goal[];
 }
 
 export default function GoalStack({ isEditable = true }: GoalStackProps) {
-  const [goalsList, setGoalsList] = useState<GoalRating[]>([]);
-  const [inProcessGoal, setInProcessGoal] = useState<GoalRating>({
+  const [goalsList, setGoalsList] = useState<Goal[]>([]);
+  const [inProcessGoal, setInProcessGoal] = useState<Goal>({
     goal: "",
-    rating: -1,
+    rating: null,
+    summary: null
   });
   const [isAddingGoal, setIsAddingGoal] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const icons = ["bi bi-check", "bi bi-exclamation", "bi bi-x"];
   const colors = ["text-success-600", "text-warning-600", "text-danger-600"];
 
   useEffect(() => {
-    fetch("/api/goals", { method: "GET" })
-      .then((response) => response.json())
-      .then((data) => {
-        const apiGoals = data.map((goalRating: GoalRating) => goalRating);
+    const goalsFromSession: Goal[] = JSON.parse(sessionStorage.getItem("goals") || "null");
 
-        setGoalsList(apiGoals);
-      });
+    setGoalsList(goalsFromSession);
   }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem("goals", JSON.stringify(goalsList));
+  }, [goalsList]);
+
+  useEffect(() => {
+    // simulate an autofocus effect
+    if (isAddingGoal) {
+      inputRef.current?.focus();
+    }
+  }, [isAddingGoal]);
 
   const addGoal = () => {
     if (inProcessGoal.goal.trim() !== "") {
+
       setGoalsList([...goalsList, inProcessGoal]);
-
-      fetch("/api/goals", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ goal: inProcessGoal }),
+      setInProcessGoal({
+        goal: "",
+        rating: inProcessGoal.rating,
+        summary: null
       });
-
-      setInProcessGoal({ goal: "", rating: inProcessGoal.rating });
     }
     setIsAddingGoal(false);
   };
@@ -53,6 +55,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
     setInProcessGoal({
       goal: event.target.value,
       rating: inProcessGoal.rating,
+      summary: null,
     });
   };
 
@@ -71,13 +74,6 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
     const newGoalsList = goalsList.filter((_, i) => i !== index);
 
     setGoalsList(newGoalsList);
-    fetch("/api/goals", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ goal: goalsList[index] }),
-    });
   };
 
   return (
@@ -93,7 +89,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
           >
             <div className="flex items-center gap-2 justify-between">
               <div className="flex gap-1 items-center">
-                {goal.rating !== -1 && (
+                {goal.rating !== null && (
                   <i
                     className={`bi ${icons[goal.rating]} ${colors[goal.rating]} text-lg`}
                   />
@@ -114,7 +110,7 @@ export default function GoalStack({ isEditable = true }: GoalStackProps) {
           <li className="w-full px-4 py-2 border rounded-b-lg border-gray-200 dark:border-gray-600">
             <div className="flex items-center gap-2 justify-between">
               <input
-                autoFocus
+                ref={inputRef}
                 className="w-full px-2 py-1 border rounded"
                 type="text"
                 value={inProcessGoal.goal}

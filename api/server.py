@@ -1,29 +1,44 @@
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import sys
 import os
 
 # include /api in the path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from api.gpt import GPT, GoalSummary, GoalWithCitedSummary
 
+load_dotenv()
+
 env = os.getenv("ENV")
+print(f"Running in {env} environment")
 
 template_folder = "../dist" if env == "dev" else "/"
 static_folder = "../dist/assets" if env == "dev" else "/assets"
-
 
 app = Flask(__name__, template_folder=template_folder, static_folder=static_folder,
             static_url_path="/assets")
 
 CORS(app, origins="*")
 
-selected_policy = "Apple"
-client = GPT(selected_policy)
+goals = []
+client = GPT("Apple")
+selected_policy = None
 
-goals = [GoalSummary(goal=goal) for goal in
-         ["Don't sell my data", "Don't give my data to law enforcement", "Allow me to delete my data"]]
+
+@app.before_request
+def set_globals():
+    global goals, selected_policy, client
+    if request.is_json:
+        print("preflight change globals")
+        data = request.get_json()
+        if 'policy' in data:
+            selected_policy = data['policy']
+            client.change_policy(selected_policy)
+        if 'goals' in data:
+            goals = [GoalSummary(goal=goal['goal'], rating=goal.get('rating'), summary=goal.get('summary')) for goal in
+                     data['goals']]
 
 
 def allow_cors(response):
@@ -44,34 +59,9 @@ def catch_all(path):
     return render_template("index.html")
 
 
-@app.route("/api/goals", methods=["GET"])
-def get_goals():
-    global goals
-    response = pydantic_jsonfiy(goals)
-    return allow_cors(response)
-
-
-@app.route("/api/goals", methods=["POST"])
-def add_goal():
-    global goals
-    data = request.get_json()
-    goals.append(GoalSummary(goal=data['goal']['goal']))
-    response = pydantic_jsonfiy(goals)
-    return allow_cors(response)
-
-
-@app.route("/api/goals", methods=["DELETE"])
-def delete_goal():
-    global goals
-    data = request.get_json()
-    goals = [goal for goal in goals if goal.goal != data['goal']['goal']]
-    return allow_cors(pydantic_jsonfiy(goals))
-
-
-@app.route("/api/goals/rating", methods=["GET"])
+@app.route("/api/goals/rating", methods=["POST"])
 def get_goal_ratings():
-    global client
-    global goals
+    global client, goals
     if goals[0].rating is None:
         goals = client.rate_goals(goals)
 
@@ -81,10 +71,9 @@ def get_goal_ratings():
     return allow_cors(response)
 
 
-@app.route("/api/summary/<id>", methods=["GET"])
+@app.route("/api/summary/<id>", methods=["POST"])
 def get_summary(id: int):
-    global client
-    global goals
+    global client, goals
     if int(id) >= len(goals):
         return jsonify({"msg": "goal not found"})
 
@@ -97,11 +86,9 @@ def get_summary(id: int):
     return allow_cors(response)
 
 
-@app.route("/api/cite/summary/<id>", methods=["GET"])
+@app.route("/api/cite/summary/<id>", methods=["POST"])
 def get_cited_summary(id: int):
-    global client
-    global goals
-
+    global client, goals
     # if the goal has already been cited, return it
     if isinstance(goals[int(id)], GoalWithCitedSummary):
         return pydantic_jsonfiy(goals[int(id)])
@@ -114,39 +101,10 @@ def get_cited_summary(id: int):
     return allow_cors(response)
 
 
-@app.route("/api/policy", methods=["GET"])
-def get_policy():
-    response = jsonify({"policy": selected_policy})
-
-    return allow_cors(response)
-
-
-@app.route("/api/policy", methods=["PUT"])
-def update_policy():
-    global selected_policy
-    global client
-    data = request.get_json()
-    if 'policy' in data:
-        selected_policy = data['policy']
-        client.change_policy(selected_policy)
-
-    response = jsonify({"policy": selected_policy})
-
-    return allow_cors(response)
-
-
-@app.route("/api/html/policy", methods=["GET"])
+@app.route("/api/html/policy", methods=["POST"])
 def get_policy_html():
     response = jsonify({"policy_html": client.policy_html})
     return response
-
-
-@app.route("/api/goals/reset", methods=["DELETE"])
-def reset_goals():
-    global goals
-    goals = [GoalSummary(goal=goal) for goal in
-             ["Don't sell my data", "Don't give my data to law enforcement", "Allow me to delete my data"]]
-    return pydantic_jsonfiy(goals)
 
 
 if __name__ == "__main__":

@@ -1,12 +1,13 @@
 import classNames from "classnames";
+import { Goal } from "@/types";
 
 interface BreakdownElementProps {
   forRating: number;
-  goals: { goal: string; rating: number }[];
+  goals: Goal[];
 }
 
 interface BreakdownProps {
-  goals: { goal: string; rating: number }[];
+  goals: Goal[];
 }
 
 function BreakdownElement({ forRating, goals }: BreakdownElementProps) {

@@ -6,6 +6,7 @@ import { Link } from "@nextui-org/link";
 import DefaultLayout from "@/layouts/default";
 import { PrivacyGuardianLogo } from "@/components/icons.tsx";
 import { siteConfig } from "@/config/site.ts";
+import { Goal } from "@/types";
 
 const masthead = (
   <div className="inline-block ml-4">
@@ -23,38 +24,41 @@ const masthead = (
 );
 
 export default function IndexPage() {
-  const [selectedPolicy, setSelectedPolicy] = useState<string | null>("Apple");
+  const [selectedPolicy, setSelectedPolicy] = useState<string>(
+    sessionStorage.getItem("policy") || "Apple",
+  );
+  const initialGoals: Goal[] = [
+    { goal: "Don't sell my data", rating: null, summary: null },
+    {
+      goal: "Don't give my data to law enforcement",
+      rating: null,
+      summary: null,
+    },
+    { goal: "Allow me to delete my data", rating: null, summary: null },
+  ];
+
+  const storedGoals: Goal[] | null = JSON.parse(
+    sessionStorage.getItem("goals") || "null",
+  );
+
+  const [goals, setGoals] = useState<Goal[]>(storedGoals || initialGoals);
   const [isInvalid, setIsInvalid] = useState(false);
 
   useEffect(() => {
-    fetch("/api/policy", { method: "GET" })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setSelectedPolicy(data.policy);
-      });
-  }, []);
+    sessionStorage.setItem("policy", selectedPolicy);
+  }, [selectedPolicy]);
+
+  useEffect(() => {
+    sessionStorage.setItem("goals", JSON.stringify(goals));
+  }, [goals]);
 
   const handlePolicyChange = async (policy: string) => {
     if (policy) {
-      fetch("/api/goals/reset", {
-        method: "DELETE",
-      }).then((resetGoals) => resetGoals.json());
-
       setSelectedPolicy(policy);
+
+      // reset goals to initial values
+      setGoals(initialGoals);
       setIsInvalid(false);
-
-      const response = await fetch("/api/policy", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ policy }),
-      });
-
-      const data = await response.json();
-
-      console.log(data);
     }
   };
 

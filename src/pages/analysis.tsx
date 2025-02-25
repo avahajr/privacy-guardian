@@ -8,18 +8,74 @@ import GoalStack from "@/components/goalStack.tsx";
 import Breakdown from "@/components/breakdown.tsx";
 import SummaryStack from "@/components/summaryStack.tsx";
 import Reaction from "@/components/reaction.tsx";
+import { Goal } from "@/types";
+import { apiRequest } from "@/helpers/requests.ts";
 
 export default function AnalysisPage() {
-  const [goals, setGoals] = useState<{ goal: string; rating: number }[] | null>(
-    null,
+  const [goals, setGoals] = useState<Goal[]>(
+    sessionStorage.getItem("goals")
+      ? JSON.parse(sessionStorage.getItem("goals") as string)
+      : undefined,
   );
+  const policy = sessionStorage.getItem("policy") || undefined;
 
   useEffect(() => {
-    fetch("/api/goals/rating", { method: "GET" })
-      .then((response) => response.json())
-      .then((data) => {
-        setGoals(data);
-      });
+    console.log("Goals updated", goals);
+    sessionStorage.setItem("goals", JSON.stringify(goals));
+  }, [goals]);
+
+  useEffect(() => {
+    const fetchGoalsData = async () => {
+      try {
+        // 1. Get rated goals.
+        const ratingResponse = await apiRequest({
+          endpoint: "goals/rating",
+          method: "POST",
+          goals: goals,
+          policy: policy,
+        });
+        const ratedGoals = await ratingResponse.json();
+
+        setGoals(ratedGoals);
+
+        // Process each goal concurrently.
+        ratedGoals.forEach((_: Goal, index: number) => {
+          (async () => {
+            // 2. Summarize the goal for the current index.
+            const summaryResponse = await apiRequest({
+              endpoint: `summary/${index}`,
+              method: "POST",
+              goals: ratedGoals,
+              policy: policy,
+            });
+            const summarizedGoal = await summaryResponse.json();
+
+            // Update the goal in state.
+            setGoals((prevGoals) =>
+              prevGoals.map((g, i) => (i === index ? summarizedGoal : g)),
+            );
+
+            // 3. Apply citation for the same goal after summarization completes.
+            const citationResponse = await apiRequest({
+              endpoint: `cite/summary/${index}`,
+              method: "POST",
+              goals: goals,
+              policy: policy,
+            });
+            const citedGoal = await citationResponse.json();
+
+            // Update the goal in state once the citation resolves.
+            setGoals((prevGoals) =>
+              prevGoals.map((g, i) => (i === index ? citedGoal : g)),
+            );
+          })();
+        });
+      } catch (error) {
+        console.error("Error fetching goals data", error);
+      }
+    };
+
+    fetchGoalsData();
   }, []);
 
   return (
@@ -33,7 +89,7 @@ export default function AnalysisPage() {
             underline="hover"
           >
             <i className="bi bi-arrow-left pr-1" />
-            Back to goals{" "}
+            Back to goals
           </Link>
           <Policy />
         </div>
@@ -42,7 +98,6 @@ export default function AnalysisPage() {
             <h3 className="font-semibold text-3xl">Your privacy report</h3>
           </div>
           {goals ? <Breakdown goals={goals} /> : <Spinner />}
-
           {goals && <Reaction goals={goals} />}
           <div className="flex justify-between mt-3">
             <h3 className="text-lg font-medium">My Goals</h3>

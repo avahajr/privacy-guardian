@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { Goal } from "@/types";
 
 interface ReactionProps {
-  goals: { goal: string; rating: number }[];
+  goals: Goal[];
 }
 
 export default function Reaction({ goals }: ReactionProps) {
@@ -13,7 +14,7 @@ export default function Reaction({ goals }: ReactionProps) {
     const seenGoals = [0, 0, 0];
 
     goals.forEach((goal) => {
-      seenGoals[goal.rating]++;
+      seenGoals[goal.rating || 0]++;
     });
 
     const totalGoals = goals.length;

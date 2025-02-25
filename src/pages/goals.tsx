@@ -4,8 +4,10 @@ import { Button } from "@nextui-org/button";
 import DefaultLayout from "@/layouts/default";
 import Policy from "@/components/policy.tsx";
 import GoalStack from "@/components/goalStack.tsx";
+import { useStorage } from "@/hooks/useStorage.ts";
 
 export default function GoalsPage() {
+  const { policy } = useStorage();
   return (
     <DefaultLayout activeStep={2} width={7}>
       <section className="flex gap-4 py-8 md:py-10">
@@ -18,7 +20,7 @@ export default function GoalsPage() {
         </div>
         <div className={"flex flex-col gap-2 w-full min-h-96"}>
           <div className="text-4xl font-semibold">Now, set some privacy goals.</div>
-          <div className="text-md font-medium text-default-500 -mt-1 mb-3">We'll use these goals to give you a personalized evaluation of the policy.</div>
+          <div className="font-medium text-default-500 -mt-1 mb-3">We&#39;ll use these goals to give you a personalized evaluation of the {policy} policy.</div>
           <div className="flex justify-between">
             <h3 className="text-xl font-medium">My Goals</h3>
           </div>
