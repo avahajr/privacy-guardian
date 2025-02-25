@@ -28,7 +28,7 @@ class QuoteLocations(BaseModel):
 class GoalWithCitedSummary(BaseModel):
     goal: str
     rating: int
-    cited_sentences: list[CitedSentence]
+    summary: list[CitedSentence]
 
 
 def split_paragraph_into_sentences(paragraph: GoalSummary):
@@ -154,7 +154,7 @@ class GPT:
             cited_summary.append(
                 CitedSentence(sentence=sentence, quote_locations=group_consecutive_citations(quote_location.locs)))
 
-        return GoalWithCitedSummary(goal=goal.goal, rating=goal.rating, cited_sentences=cited_summary)
+        return GoalWithCitedSummary(goal=goal.goal, rating=goal.rating, summary=cited_summary)
 
 
 if __name__ == "__main__":

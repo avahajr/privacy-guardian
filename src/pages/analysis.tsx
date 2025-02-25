@@ -51,15 +51,14 @@ export default function AnalysisPage() {
             const summarizedGoal = await summaryResponse.json();
 
             // Update the goal in state.
-            setGoals((prevGoals) =>
-              prevGoals.map((g, i) => (i === index ? summarizedGoal : g)),
-            );
+            const goalsWithSummarizedGoal = goals.map((g, i) => (i === index ? summarizedGoal : g))
+            setGoals(goalsWithSummarizedGoal);
 
             // 3. Apply citation for the same goal after summarization completes.
             const citationResponse = await apiRequest({
               endpoint: `cite/summary/${index}`,
               method: "POST",
-              goals: goals,
+              goals: goalsWithSummarizedGoal,
               policy: policy,
             });
             const citedGoal = await citationResponse.json();
