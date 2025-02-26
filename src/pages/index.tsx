@@ -46,6 +46,7 @@ export default function IndexPage() {
 
   useEffect(() => {
     sessionStorage.setItem("policy", selectedPolicy);
+    sessionStorage.removeItem("policy_html");
   }, [selectedPolicy]);
 
   useEffect(() => {
