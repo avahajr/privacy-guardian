@@ -4,6 +4,8 @@ from flask_cors import CORS
 import sys
 import os
 
+from pydantic import ValidationError
+
 # include /api in the path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -37,8 +39,11 @@ def set_globals():
             selected_policy = data['policy']
             client.change_policy(selected_policy)
         if 'goals' in data:
-            goals = [GoalSummary(goal=goal['goal'], rating=goal.get('rating'), summary=goal.get('summary')) for goal in
-                     data['goals']]
+            try:
+                goals = [GoalSummary(goal=goal['goal'], rating=goal.get('rating'), summary=goal.get('summary')) for goal in
+                         data['goals']]
+            except ValidationError:
+                goals = [GoalWithCitedSummary(goal=goal['goal'], rating=goal.get('rating'), summary=goal.get('summary')) for goal in data['goals']]
 
 
 def allow_cors(response):

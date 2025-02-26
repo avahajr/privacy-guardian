@@ -24,7 +24,7 @@ export default function Policy() {
       <CardBody id={"policy-text"}>
         <div
           dangerouslySetInnerHTML={{ __html: policyHTML }}
-          className="text-default-700"
+          className="text-default-700 h-[55vh] overflow-y-scroll"
         />
       </CardBody>
     </Card>

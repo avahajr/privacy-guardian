@@ -69,7 +69,7 @@ function highlight(span_to_highlight: number[]) {
     );
 
     if (toHighlight != null) {
-      toHighlight.classList.add("highlighted");
+      toHighlight.classList.add("bg-yellow-200");
       if (i == 0) {
         toHighlight.scrollIntoView({ behavior: "smooth", block: "start" });
       }
