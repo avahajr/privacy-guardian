@@ -54,10 +54,10 @@ const renderSummary = (summary: CitedSentence[] | string | null) => {
 };
 
 function clearHighlights() {
-  const highlightedElements = document.querySelectorAll(".highlighted");
+  const highlightedElements = document.querySelectorAll(".bg-yellow-200");
 
   highlightedElements.forEach((element) => {
-    element.classList.remove("highlighted");
+    element.classList.remove("bg-yellow-200");
   });
 }
 
@@ -100,7 +100,9 @@ export default function SummaryStack({ goals }: { goals: Goal[] }) {
   const groupedSummaries = goals
     .reduce(
       (acc, summary) => {
-        acc[summary.rating || 0].push(summary);
+        if (summary.rating !== null) {
+          acc[summary.rating].push(summary);
+        }
 
         return acc;
       },
