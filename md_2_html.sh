@@ -11,4 +11,4 @@ for file in "$input_dir"/*.md; do
   markdown2 "$file" > "$input_dir/$base_name.html"
 done
 
-python /api/convert.py
+python api/convert.py

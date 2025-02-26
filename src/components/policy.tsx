@@ -1,4 +1,4 @@
-import { Card, CardBody } from "@nextui-org/card";
+import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { useEffect, useState } from "react";
 
 import { apiRequest } from "@/helpers/requests";
@@ -21,6 +21,7 @@ export default function Policy() {
 
   return (
     <Card className="p-2 sticky top-48">
+      <CardHeader className={"font-medium font-mono text-xs text-default-500"}>{policy?.toLowerCase()}_policy.md</CardHeader>
       <CardBody id={"policy-text"}>
         <div
           dangerouslySetInnerHTML={{ __html: policyHTML }}
